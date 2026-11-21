@@ -137,40 +137,64 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .foot .wc{font-size:13px;color:var(--mute-l);font-variant-numeric:tabular-nums;white-space:nowrap}
 .linkish{color:var(--ember-deep);font-size:14px;font-weight:500;padding:10px 0}
 
-/* preview */
-.pv{padding-block:24px 36px;display:flex;flex-direction:column;gap:18px}
-.pv h2{font-size:32px;margin:0;line-height:1.1}
-.card{position:relative;border-radius:24px;padding:5px;background:linear-gradient(160deg,#D99A66,#A8622F);box-shadow:0 18px 40px rgba(40,28,18,.2)}
-.card .stage{border-radius:20px;aspect-ratio:4/5;width:100%}
-.card .meta{position:absolute;left:24px;right:24px;bottom:20px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;z-index:5;font-size:13px;pointer-events:none}
-.card .meta b{font-weight:500;font-size:15px}
-.card .meta span{opacity:.7}
-.card.dawnish .meta{color:var(--char)}
-.card:not(.dawnish) .meta{color:var(--bone)}
-.composing{position:absolute;inset:5px;border-radius:20px;background:#13110F;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:6;text-align:center;padding:24px}
+/* preview: one hero card that fills the screen, quiet controls under it */
+.pv{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;padding-block:14px 14px}
+.card{position:relative;flex:1;min-height:300px;border-radius:26px;box-shadow:0 1px 0 rgba(255,255,255,.5),0 22px 48px -12px rgba(40,28,18,.38),0 0 0 1px rgba(27,25,23,.06);transition:transform .5s var(--settle)}
+.card .stage{position:absolute;inset:0;border-radius:26px;transition:opacity .4s var(--ease),background-color .9s var(--ease)}
+.card .stage.fading{opacity:0}
+.ticks{position:absolute;left:18px;right:18px;top:16px;z-index:5;display:flex;gap:3px;height:2px;pointer-events:none}
+.ticks i{position:relative;display:block;height:100%;border-radius:2px;background:currentColor;opacity:.22;overflow:hidden}
+.ticks i.done{opacity:.6}
+.ticks i.on{opacity:1;background:transparent}
+.ticks i.on::before{content:"";position:absolute;inset:0;background:currentColor;opacity:.22}
+.ticks i.on::after{content:"";position:absolute;inset:0;background:var(--ember);transform-origin:left;animation:tick var(--dur,3s) linear both}
+@keyframes tick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.card .meta{position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;z-index:5;font-size:12.5px;pointer-events:none;transition:color .9s var(--ease)}
+.card .meta b{font-family:var(--serif);font-style:italic;font-weight:300;font-size:18px;font-variation-settings:"opsz" 72}
+.card .meta span{opacity:.62;letter-spacing:.01em}
+.card.dawnish .meta,.card.dawnish .ticks{color:var(--char)}
+.card:not(.dawnish) .meta,.card:not(.dawnish) .ticks{color:var(--bone)}
+.composing{position:absolute;inset:0;border-radius:26px;background:#13110F;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:6;text-align:center;padding:24px}
 .composing .arc{width:54px;height:33px;animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.35;transform:scale(.94)}}
+.composing .line{font-family:var(--serif);font-style:italic;font-weight:300;font-size:21px;min-height:1.4em}
 .composing{transition:opacity .9s var(--ease),visibility 0s .9s}
 .composing.gone{opacity:0;visibility:hidden}
 .composing .line{transition:opacity .45s var(--ease)}
 .composing .line.swap{opacity:0}
-.composing .line{font-family:var(--serif);font-style:italic;font-weight:300;font-size:21px;min-height:1.4em}
-.nudges{display:flex;flex-wrap:wrap;gap:8px}
-.nudge{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line-l);font-size:14.5px;color:var(--char);background:rgba(255,255,255,.25)}
+.nudges{flex:none;display:flex;gap:6px;justify-content:space-between}
+.nudge{flex:1 1 auto;min-height:42px;padding:0 10px;border-radius:999px;border:1px solid var(--line-l);font-size:14px;color:var(--char);white-space:nowrap;transition:background-color .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease)}
 .nudge[aria-pressed="true"]{background:var(--char);border-color:var(--char);color:var(--bone)}
-.nudge.go{color:var(--ember-deep);border-color:rgba(168,98,47,.4)}
-.hr{height:1px;background:var(--line-l);margin:4px 0}
-.beats{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.nudge.go{color:var(--ember-deep);border-color:rgba(168,98,47,.38)}
+.pvfoot{gap:14px}
+.pvplay{width:52px;height:52px;border-radius:50%;background:var(--char);color:var(--bone);display:grid;place-items:center;flex:none}
+.pvplay svg{margin-left:3px}
+.pvlbl{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.25}
+.pvlbl b{font-weight:500;font-size:15px}
+.pvlbl>span{font-size:13px;color:var(--mute-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pacebtn{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;margin-right:-6px;border-radius:999px;font-size:14px;color:var(--mute-l);font-variant-numeric:tabular-nums}
+.pacebtn svg{color:var(--ember-deep)}
+/* the pacing sheet */
+.psheet{position:absolute;inset:0;z-index:30}
+.psheet .scrim{position:absolute;inset:0;background:rgba(20,16,12,.34);opacity:0;transition:opacity .5s var(--ease)}
+.psheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:76%;display:flex;flex-direction:column;background:var(--paper);border-radius:24px 24px 0 0;box-shadow:0 -18px 50px rgba(40,28,18,.22);transform:translate3d(0,102%,0);transition:transform .55s var(--settle);padding-bottom:env(safe-area-inset-bottom,0px)}
+.psheet .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background-image:var(--grain-l);background-size:220px;mix-blend-mode:multiply;opacity:.55;pointer-events:none}
+.psheet.open .scrim{opacity:1}
+.psheet.open .panel{transform:translate3d(0,var(--drag,0px),0)}
+.psheet.dragging .panel{transition:none}
+.psheet .grab{flex:none;height:28px;display:grid;place-items:center;touch-action:none;cursor:grab}
+.psheet .grab i{width:38px;height:5px;border-radius:3px;background:var(--line-l)}
+.phead{flex:none;padding-bottom:12px;touch-action:none}
+.phead .why{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--mute-l)}
+.beats{list-style:none;margin:0;padding-top:0;padding-bottom:18px;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.beats::-webkit-scrollbar{display:none}
 .beats li button{display:grid;grid-template-columns:1fr auto;gap:4px 12px;width:100%;text-align:left;padding:12px 0;border-top:1px solid var(--line-l)}
-.beats li:last-child button{border-bottom:1px solid var(--line-l)}
 .beats .tx{font-family:var(--serif);font-size:16.5px;line-height:1.35;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .beats .sec{font-size:12.5px;color:var(--mute-l);font-variant-numeric:tabular-nums;text-align:right}
 .beats .kind{font-size:12px;color:var(--ember-deep);letter-spacing:.04em}
 .beats .bar2{height:3px;border-radius:2px;background:var(--line-l);align-self:center;overflow:hidden}
 .beats .bar2 i{display:block;height:100%;background:var(--ember);border-radius:2px}
 .beats li.on .tx{color:var(--ember-deep)}
-.pvplay{width:50px;height:50px;border-radius:50%;background:var(--char);color:var(--bone);display:grid;place-items:center;flex:none}
-.pvplay svg{margin-left:3px}
 .foot .score{font-family:var(--serif);font-style:italic;font-weight:300;font-size:24px;white-space:nowrap}
 
 /* deliver */
@@ -378,34 +402,35 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
     </div>
   </section>
 
-  <!-- PREVIEW -->
+  <!-- PREVIEW: the composed piece is the hero; the pacing lives in a sheet -->
   <section class="scr paper" id="s-preview" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="write">Back</button><span class="t">Preview</span><button class="r" type="button" id="b-next">Next</button></nav>
-    <div class="scroll gut">
-      <div class="pv stagger">
-        <h2 class="ital">Composed for you.</h2>
-        <div class="card" id="pv-card">
-          <div class="stage look-vesper" id="pv-stage"></div>
-          <div class="meta"><b id="pv-look">Vesper</b><span id="pv-desc"></span></div>
-          <div class="composing" id="pv-composing" hidden><span class="arc" data-arc></span><div class="line" id="pv-cline">Reading what you wrote</div></div>
-        </div>
-        <p class="muted" id="pv-why"></p>
-        <div class="hr"></div>
-        <h3 class="ital" style="font-size:24px;margin:0">Not quite it?</h3>
-        <div class="nudges">
-          <button class="nudge" type="button" data-nudge="warm" aria-pressed="false">Warmer</button>
-          <button class="nudge" type="button" data-nudge="quiet" aria-pressed="false">Quieter</button>
-          <button class="nudge" type="button" data-nudge="simple" aria-pressed="false">Simpler</button>
-          <button class="nudge go" type="button" data-nudge="another">Try another</button>
-        </div>
-        <p class="eyebrow" style="margin-top:8px" id="pv-total">The pacing</p>
-        <ol class="beats" id="pv-beats"></ol>
+    <div class="pv gut stagger">
+      <div class="card" id="pv-card">
+        <div class="stage look-vesper" id="pv-stage"></div>
+        <div class="ticks" id="pv-ticks" aria-hidden="true"></div>
+        <div class="meta"><b id="pv-look">Vesper</b><span id="pv-desc"></span></div>
+        <div class="composing" id="pv-composing" hidden><span class="arc" data-arc></span><div class="line" id="pv-cline">Reading what you wrote</div></div>
+      </div>
+      <div class="nudges" role="group" aria-label="Adjust the composition">
+        <button class="nudge" type="button" data-nudge="warm" aria-pressed="false">Warmer</button>
+        <button class="nudge" type="button" data-nudge="quiet" aria-pressed="false">Quieter</button>
+        <button class="nudge" type="button" data-nudge="simple" aria-pressed="false">Simpler</button>
+        <button class="nudge go" type="button" data-nudge="another">Try another</button>
       </div>
     </div>
-    <div class="foot gut">
+    <div class="foot gut pvfoot">
       <button class="pvplay" id="b-pvplay" type="button" aria-label="Watch it with sound"><svg width="16" height="18" viewBox="0 0 16 18" aria-hidden="true"><path d="M1 1.5v15l13.5-7.5z" fill="currentColor"/></svg></button>
-      <span class="score" id="pv-score">Low Tide</span>
-      <span class="lbl">watch it the way <span id="pv-to">they</span> will</span>
+      <span class="pvlbl"><b>Watch it with sound</b><span>the way <span id="pv-to">they</span> will</span></span>
+      <button class="pacebtn" id="b-pacing" type="button" aria-haspopup="dialog"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2h9M1 7h14M1 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span id="pv-secs">Pacing</span></button>
+    </div>
+    <div class="psheet" id="pace-sheet" hidden>
+      <div class="scrim"></div>
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pv-total">
+        <div class="grab" aria-hidden="true"><i></i></div>
+        <div class="phead gut"><p class="eyebrow" id="pv-total">The pacing</p><p class="why" id="pv-why"></p></div>
+        <ol class="beats gut" id="pv-beats"></ol>
+      </div>
     </div>
   </section>
 
@@ -967,7 +992,7 @@ const ORDER = { cover: 0, shelf: 1, write: 2, preview: 3, deliver: 4, sealed: 5,
 const DARK = new Set(['arrive', 'cover', 'play', 'end']);
 const leaveT = {};
 function show(id, opt = {}) {
-  if (current === 'preview' && id !== 'preview') stopCardLoop();
+  if (current === 'preview' && id !== 'preview') { stopCardLoop(); closePacing(); }
   const nx = $('#s-' + id), pv = current && current !== id ? $('#s-' + current) : null, was = current;
   current = id;
   if (pv) {
@@ -1075,7 +1100,7 @@ $('#b-compose').addEventListener('click', async () => {
   store.set('me', from);
   D.L = { f: from, t: to, x: text, at: Date.now(), o: 0, h: true, r: true, c: composeRules(text, to) };
   show('preview'); $('#pv-to').textContent = to;
-  const cmp = $('#pv-composing'); cmp.hidden = false; cmp.classList.remove('gone'); $('#pv-stage').innerHTML = ''; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = '';
+  const cmp = $('#pv-composing'); cmp.hidden = false; cmp.classList.remove('gone'); $('#pv-stage').innerHTML = ''; $('#pv-ticks').innerHTML = ''; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = ''; $('#pv-secs').textContent = 'Pacing';
   $$('.nudge[aria-pressed]').forEach(b => b.setAttribute('aria-pressed', 'false'));
   let k = 0; $('#pv-cline').textContent = CLINES[0];
   const cl = $('#pv-cline'); cl.classList.remove('swap');
@@ -1091,29 +1116,58 @@ $('#b-compose').addEventListener('click', async () => {
 function renderPreview(fresh) {
   const L = D.L, c = L.c, bs = effBeats(L), total = bs.reduce((a, b) => a + b.dur, 0);
   const lk = LOOK[c.look], sc = SCORE[c.look];
-  $('#pv-look').textContent = lk.name; $('#pv-desc').textContent = `${lk.desc} · score: ${sc.name}`; $('#pv-score').textContent = sc.name;
+  $('#pv-look').textContent = lk.name; $('#pv-desc').textContent = `${lk.desc} · ${sc.name}`;
   $('#pv-card').classList.toggle('dawnish', c.look === 'dawn');
   const pace = c.quiet ? 'unhurried pacing' : (total / 1000 / Math.max(1, wc(L.x)) > .8 ? 'slow pacing' : 'steady pacing');
   $('#pv-why').textContent = (c.note && fresh !== 'nudge' ? c.note + ' ' : `Set for what you wrote: ${pace}, ${lk.desc.toLowerCase()}, a ${c.quiet ? 'hushed' : 'quiet'} score. `) + 'Your words are unchanged.';
   $('#pv-total').textContent = `The pacing · ${Math.round(total / 1000)} seconds, ${bs.length} beats`;
+  $('#pv-secs').textContent = `${Math.round(total / 1000)} s`;
+  $('#pv-ticks').innerHTML = bs.map(b => `<i style="flex:${b.dur} 1 0"></i>`).join('');
   const max = Math.max(...bs.map(b => b.dur));
   $('#pv-beats').innerHTML = bs.map((b, i) => `<li data-i="${i}"><button type="button"><span class="tx">${esc(b.text)}</span><span class="sec">${(b.dur / 1000).toFixed(1)} s</span><span class="kind">${KIND[b.st]}</span><span class="bar2"><i style="width:${Math.round(b.dur / max * 100)}%"></i></span></button></li>`).join('');
-  $$('#pv-beats li').forEach(li => li.querySelector('button').addEventListener('click', () => cardLoop(+li.dataset.i)));
-  cardLoop(0);
+  $$('#pv-beats li').forEach(li => li.querySelector('button').addEventListener('click', () => { closePacing(); cardLoop(+li.dataset.i, true); }));
+  cardLoop(0, fresh === 'nudge');
 }
 let CL = null;
 function stopCardLoop() { if (CL) clearTimeout(CL); CL = null; }
-function cardLoop(i) {
+function cardLoop(i, soft) {
   stopCardLoop(); const L = D.L, bs = effBeats(L), st = $('#pv-stage');
-  setStageLook(st, L.c); if (i === 0) st.innerHTML = '';
   const step = j => {
     if (current !== 'preview') return;
-    const b = bs[j % bs.length]; renderBeat(st, b, L, j % bs.length);
-    $$('#pv-beats li').forEach((li, k) => li.classList.toggle('on', k === j % bs.length));
+    const k = j % bs.length, b = bs[k];
+    if (k === 0 && j > 0) st.innerHTML = '';
+    renderBeat(st, b, L, k);
+    $$('#pv-beats li').forEach((li, n) => li.classList.toggle('on', n === k));
+    $$('#pv-ticks i').forEach((t, n) => { t.className = n < k ? 'done' : n === k ? 'on' : ''; if (n === k) { t.style.setProperty('--dur', b.dur + 'ms'); t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; } });
     CL = setTimeout(() => step(j + 1), b.dur);
   };
-  step(i);
+  // A nudge or a jump dims the card for a moment, then the new version plays in.
+  if (soft && st.children.length) {
+    st.classList.add('fading');
+    CL = setTimeout(() => { setStageLook(st, L.c); st.innerHTML = ''; st.classList.remove('fading'); step(i); }, 420);
+  } else { setStageLook(st, L.c); st.innerHTML = ''; step(i); }
 }
+
+/* the pacing sheet: slides up over the preview, drag or tap outside to put it away */
+const PS = $('#pace-sheet');
+function openPacing() {
+  if (!D.L || !$('#pv-beats').children.length) return;
+  PS.hidden = false; PS.style.setProperty('--drag', '0px'); void PS.offsetWidth; PS.classList.add('open');
+  const on = $('#pv-beats li.on'); if (on) on.scrollIntoView({ block: 'nearest' });
+}
+function closePacing() {
+  if (PS.hidden) return; PS.classList.remove('open', 'dragging'); PS.style.setProperty('--drag', '0px');
+  clearTimeout(PS._t); PS._t = setTimeout(() => { if (!PS.classList.contains('open')) PS.hidden = true; }, 560);
+}
+$('#b-pacing').addEventListener('click', openPacing);
+PS.querySelector('.scrim').addEventListener('click', closePacing);
+(() => {
+  let y0 = 0, dy = 0, t0 = 0, id = null;
+  const down = e => { id = e.pointerId; y0 = e.clientY; dy = 0; t0 = performance.now(); PS.classList.add('dragging'); try { e.currentTarget.setPointerCapture(id); } catch (_) {} };
+  const move = e => { if (e.pointerId !== id) return; dy = Math.max(0, e.clientY - y0); PS.style.setProperty('--drag', (dy < 0 ? dy / 4 : dy) + 'px'); };
+  const up = e => { if (e.pointerId !== id) return; id = null; PS.classList.remove('dragging'); const v = dy / Math.max(1, performance.now() - t0); if (dy > 110 || v > .6) closePacing(); else PS.style.setProperty('--drag', '0px'); };
+  PS.querySelectorAll('.grab,.phead').forEach(h => { h.addEventListener('pointerdown', down); h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up); });
+})();
 $('.nudges').addEventListener('click', e => {
   const b = e.target.closest('.nudge'); if (!b || !D.L) return; const c = D.L.c, k = b.dataset.nudge;
   if (k === 'another') { c.look = LOOKS[(LOOKS.indexOf(c.look) + 1) % LOOKS.length]; c.seed = (Math.random() * 1e9) | 0; }
