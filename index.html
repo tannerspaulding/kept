@@ -293,38 +293,47 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .stage.warm{--glow:rgba(232,140,70,.32)}
 .stage.quiet{--glow:rgba(206,139,88,.09)}
 .stage.quiet.look-dawn{--glow:rgba(236,178,120,.18)}
-.beat{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:0 9cqw;font-family:var(--serif);font-weight:300}
-.beat.out{animation:bOut 1s ease forwards}
-@keyframes bOut{to{opacity:0;filter:blur(8px)}}
-.w{display:inline-block;opacity:0;animation:wIn 1.2s cubic-bezier(.2,.6,.2,1) both;animation-delay:var(--d,0ms)}
-@keyframes wIn{from{opacity:0;filter:blur(6px);transform:translateY(.14em)}to{opacity:1;filter:blur(0);transform:none}}
+/* Beats are title cards. Each one sits a touch above centre, arrives phrase by phrase out of a soft blur,
+   drifts very slowly toward the viewer while it holds, then dissolves. The next waits for the dark (--lead). */
+.beat{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:0 9cqw 7cqh;font-family:var(--serif);font-weight:300;font-variation-settings:"opsz" 144;
+  animation:push var(--bd,6s) linear both;transform-origin:50% 46%}
+.beat.out{animation:push var(--bd,6s) linear both,bOut .85s var(--ease) forwards}
+@keyframes push{from{scale:1}to{scale:1.035}}
+@keyframes bOut{to{opacity:0;filter:blur(7px)}}
+.w{display:inline-block;opacity:0;animation:wIn 1.5s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes wIn{from{opacity:0;filter:blur(9px);transform:translateY(.06em)}to{opacity:1;filter:blur(0);transform:none}}
 .w.slow{animation-duration:2.6s}
-.w.land{animation:land 1.6s cubic-bezier(.15,.7,.2,1) both;animation-delay:var(--d,0ms)}
-@keyframes land{from{opacity:0;transform:scale(1.1);filter:blur(12px)}to{opacity:1;transform:none;filter:blur(0)}}
+.w.land{animation:land 1.8s cubic-bezier(.12,.7,.2,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes land{from{opacity:0;transform:scale(1.12);filter:blur(14px)}to{opacity:1;transform:none;filter:blur(0)}}
+.w.fall{animation:fall 2.4s cubic-bezier(.3,.1,.2,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes fall{from{opacity:0;transform:translateY(-.9em);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
 .paused,.paused *,.paused::before{animation-play-state:paused!important}
 .beat p{margin:0}
-.t-name{font-style:italic;font-size:17cqw;line-height:1;text-align:center;font-variation-settings:"opsz" 144}
-.t-plain{font-size:8.4cqw;line-height:1.2;font-variation-settings:"opsz" 72;text-wrap:pretty;transform:translateY(var(--y,0))}
-.t-lead{font-size:7.4cqw;line-height:1.2;font-variation-settings:"opsz" 72;margin-bottom:1cqw!important}
-.t-weight{font-size:25cqw;line-height:.95;font-weight:640;letter-spacing:-.02em;font-variation-settings:"opsz" 144;margin-left:-1cqw!important}
-.t-drop{position:absolute;left:66%;top:64%;font-style:italic;font-size:4.6cqw;color:var(--sfg)}
-.t-item{font-size:8.2cqw;line-height:1.25;opacity:0;animation:wIn 1.4s cubic-bezier(.2,.6,.2,1) both;animation-delay:var(--d,0ms)}
-.t-item:nth-child(2){padding-left:8cqw}
-.t-item:nth-child(3){padding-left:16cqw}
-.t-item:nth-child(4){padding-left:24cqw}
+/* one scale for every beat: sizes follow the frame's width, capped by its height for wide cards */
+.t-name{font-style:italic;font-size:min(var(--fit,18cqw),9.4cqh);line-height:1;text-align:center;letter-spacing:-.012em}
+.t-plain{font-size:min(9.4cqw,5cqh);line-height:1.13;letter-spacing:-.012em;text-wrap:balance;transform:translateY(var(--y,0))}
+.t-lead{font-style:italic;font-size:min(7cqw,3.8cqh);line-height:1.18;color:var(--soft);margin-bottom:2.5cqw!important;text-wrap:balance}
+.t-weight{font-size:min(var(--fit,26cqw),14cqh);line-height:.92;font-weight:600;letter-spacing:-.03em;margin-left:-.6cqw!important;white-space:nowrap}
+.t-drop{align-self:flex-end;margin:9cqh 1cqw 0 0!important;font-style:italic;font-size:min(6cqw,3.2cqh);color:var(--soft);letter-spacing:.01em}
+.t-item{font-size:min(8.6cqw,4.6cqh);line-height:1.18;letter-spacing:-.01em;opacity:0;animation:wIn 1.6s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+.t-item+.t-item{margin-top:1.2cqh!important}
+.t-item:nth-child(2){padding-left:7cqw}
+.t-item:nth-child(3){padding-left:14cqw}
+.t-item:nth-child(4){padding-left:21cqw}
+.t-item:nth-child(5){padding-left:28cqw}
 .t-item.last{color:var(--acc);font-style:italic}
-.t-whisper{font-style:italic;font-size:7.6cqw;text-align:center;color:var(--soft)}
-.t-close{font-size:10.2cqw;line-height:1.14;text-align:center;font-variation-settings:"opsz" 120;text-wrap:balance}
+.t-whisper{font-style:italic;font-size:min(8cqw,4.3cqh);text-align:center;color:var(--soft);letter-spacing:.005em}
+.t-close{font-size:min(10.4cqw,5.6cqh);line-height:1.1;letter-spacing:-.015em;text-align:center;text-wrap:balance}
 .em-glow{color:var(--acc);font-style:italic;text-shadow:0 0 .35em var(--glow)}
-.st-close .em-glow{animation:wIn 1.6s cubic-bezier(.2,.6,.2,1) both,glowp 4s ease-in-out 1s infinite;animation-delay:var(--d,0ms),calc(var(--d,0ms) + 1.6s)}
+.st-close .em-glow{animation:wIn 2s cubic-bezier(.25,.1,.25,1) both,glowp 4s ease-in-out 1s infinite;animation-delay:calc(var(--lead,0ms) + var(--d,0ms)),calc(var(--lead,0ms) + var(--d,0ms) + 2s)}
 @keyframes glowp{50%{text-shadow:0 0 .6em var(--acc)}}
-.mosaic{position:absolute;left:7cqw;right:7cqw;top:9cqh;bottom:24cqh;overflow:hidden;font:400 2.25cqw/1.62 var(--sans);text-align:justify;color:var(--sfg);animation:fadeIn 1.6s ease both;-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent)}
+.mosaic{position:absolute;left:7cqw;right:7cqw;top:9cqh;bottom:24cqh;overflow:hidden;font:400 2.25cqw/1.62 var(--sans);text-align:justify;color:var(--sfg);animation:fadeIn 1.8s var(--ease) both;animation-delay:var(--lead,0ms);-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent)}
 .mosaic span{opacity:var(--mos)}
-.mosaic span.lit{animation:lit 1.1s ease both;animation-delay:var(--ld,0ms)}
+.mosaic span.lit{animation:lit 1.2s ease both;animation-delay:calc(var(--lead,0ms) + var(--ld,0ms))}
 @keyframes lit{from{opacity:var(--mos)}to{opacity:1;color:var(--acc)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .st-echo{justify-content:flex-end;padding-bottom:9cqh}
-.t-echo{font-style:italic;font-size:7.2cqw;line-height:1.2;text-align:center;text-wrap:balance}
+.t-echo{font-style:italic;font-size:min(7.6cqw,4cqh);line-height:1.16;text-align:center;text-wrap:balance}
 .stage .mark{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:var(--acc)}
 
 /* play screen */
@@ -362,7 +371,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .toast.bye{animation:fadeAway .5s var(--ease) forwards}
 
 @media (prefers-reduced-motion:reduce){
-  .w,.w.land,.t-item,.mosaic span.lit{animation-duration:1.2s!important;transform:none!important;filter:none!important}
+  .w,.w.land,.w.fall,.t-item,.mosaic span.lit{animation-duration:1.2s!important;transform:none!important;filter:none!important}
+  .beat,.beat.out{scale:none!important}
+  @keyframes fall{from{opacity:0}to{opacity:1}}
   .rings .rg,.stage::before{animation:none}
   .scr.entering,.scr.leaving{animation-duration:.25s!important;animation-delay:0s!important}
   .scr.entering .stagger>*{animation:none!important}
@@ -721,13 +732,15 @@ const splitEm = (t, em) => {
   if (i < 0) { const m = t.match(/^(.*?)(\S+)$/); return m ? [m[1].trim(), m[2]] : ['', t]; }
   return [t.slice(0, i).trim(), t.slice(i).trim()];
 };
-const ITEM_D = (k, n, D) => 400 + k * Math.max(900, (D - 2200) / n);
-const FRAC = { weight: .42, drop: .56, close: .34 };
+const ITEM_D = (k, n, D) => 300 + k * Math.max(900, (D - 2400) / n);
+const FRAC = { weight: .36, drop: .5, close: .34 };
+// The dark between two beats: the last one dissolves, a breath of nothing, then the next arrives.
+const LEAD = 520;
 
 function effBeats(L) {
   const c = L.c, text = L.x;
   const tempo = (c.tempo || 1) * (c.quiet ? 1.12 : 1) * (c.warm ? 1.1 : 1);
-  return c.beats.map(b => {
+  return c.beats.map((b, i) => {
     let st = b.st; const t = text.slice(b.s, b.e);
     if (c.simple && ['weight', 'drop', 'list', 'echo'].includes(st)) st = 'plain';
     const n = wc(t); let d;
@@ -741,7 +754,8 @@ function effBeats(L) {
       case 'drop': d = 3000 + 380 * n; break;
       default: d = 1900 + 360 * n;
     }
-    return { text: t, st, em: b.em, dur: Math.round(d * tempo) };
+    const lead = i ? LEAD : 0;
+    return { text: t, st, em: b.em, lead, dur: Math.round(d * tempo) + lead };
   });
 }
 const totalSec = L => Math.round(effBeats(L).reduce((a, b) => a + b.dur, 0) / 1000);
@@ -896,7 +910,7 @@ function strings(S, notes, t, dur, lvl, pad) {
   if (dur < 999) lfo.stop(t + dur + 6);
 }
 function beatMusic(S, b, i) {
-  const ctx = S.ctx, sc = S.sc, t = ctx.currentTime + .06, v = S.q ? .55 : .85, D = b.dur / 1000;
+  const ctx = S.ctx, sc = S.sc, t = ctx.currentTime + .06 + (b.lead || 0) / 1000, v = S.q ? .55 : .85, D = (b.dur - (b.lead || 0)) / 1000;
   const ch = sc.chords[S.ci++ % sc.chords.length];
   const arp = (notes, t0, vel, k) => notes.slice(0, k).forEach((m, j) => piano(S, m, t0 + j * .17 + Math.random() * .03, vel * (1 - j * .12)));
   switch (b.st) {
@@ -904,7 +918,7 @@ function beatMusic(S, b, i) {
     case 'plain': arp(ch, t, .7 * v, S.q ? 1 : 3); if (!S.q && D > 4.5) piano(S, sc.mel[(i * 2) % sc.mel.length], t + D * .55, .28 * v); break;
     case 'weight': arp(ch.slice(1), t, .45 * v, 2); piano(S, ch[0] - 12, t + D * FRAC.weight, 1 * v); piano(S, ch[0], t + D * FRAC.weight + .02, .6 * v); if (S.w) strings(S, ch, t + D * FRAC.weight, D * .5, .5); break;
     case 'drop': arp(ch, t, .5 * v, 2); piano(S, sc.mel[sc.mel.length - 1] + 12, t + D * FRAC.drop, .2 * v); break;
-    case 'list': { const n = b.text.split(/,\s*/).length; piano(S, ch[0] - 12, t, .5 * v); for (let k = 0; k < n; k++) piano(S, sc.mel[k % sc.mel.length], t + ITEM_D(k, n, b.dur) / 1000, .45 * v); break; }
+    case 'list': { const n = b.text.split(/,\s*/).length; piano(S, ch[0] - 12, t, .5 * v); for (let k = 0; k < n; k++) piano(S, sc.mel[k % sc.mel.length], t + ITEM_D(k, n, D * 1000) / 1000, .45 * v); break; }
     case 'echo': if (!S.q) strings(S, ch, t, D * .8, .6); piano(S, sc.mel[1], t + .3, .4 * v); piano(S, sc.mel[1], t + D * .42, .32 * v); piano(S, sc.mel[3], t + D * .7, .28 * v); break;
     case 'whisper': piano(S, sc.mel[3], t + .5, .26 * v); break;
     case 'close': strings(S, sc.resolve, t + .1, D + 1.5, S.q ? .35 : .7); sc.resolve.forEach((m, j) => piano(S, m, t + .25 + j * .22, .6 * v)); piano(S, sc.mel[0] + 12, t + D * FRAC.close + .4, .35 * v); piano(S, sc.resolve[0] - 12, t + D * .8, .5 * v); break;
@@ -912,24 +926,30 @@ function beatMusic(S, b, i) {
 }
 
 /* ---------- beat rendering ---------- */
+// Words arrive in phrases, the way they'd be said: close together inside a phrase, a breath at each comma.
 function wordsHTML(text, d0, span, cls = '') {
-  const ws = text.split(' ').filter(Boolean), step = ws.length > 1 ? span / (ws.length - 1) : 0;
-  return ws.map((w, i) => `<span class="w ${cls}" style="--d:${Math.round(d0 + i * step)}ms">${esc(w)}</span>`).join(' ');
+  const ws = text.split(' ').filter(Boolean), at = []; let t = 0;
+  ws.forEach((w, i) => { at.push(t); t += /[,;:\u2014-]$/.test(w) ? 420 : 150; });
+  const last = at[at.length - 1] || 0, k = last > span ? span / last : 1;
+  return ws.map((w, i) => `<span class="w ${cls}" style="--d:${Math.round(d0 + at[i] * k)}ms">${esc(w)}</span>`).join(' ');
 }
+// Big single words are sized to the frame, so a long one never breaks or spills.
+const fitCqw = (word, max, per) => Math.min(max, per / Math.max(1, word.length)).toFixed(2) + 'cqw';
 function renderBeat(stage, b, L, idx) {
   const el = document.createElement('div'); el.className = 'beat st-' + b.st;
-  const D = b.dur, r = rng((L.c.seed || 1) + idx * 97);
+  const lead = stage.querySelector('.beat:not(.out)') ? (b.lead || 0) : 0, D = b.dur - (b.lead || 0), r = rng((L.c.seed || 1) + idx * 97);
+  el.style.setProperty('--lead', lead + 'ms'); el.style.setProperty('--bd', (b.dur + 1200) + 'ms');
   switch (b.st) {
-    case 'name': el.innerHTML = `<p class="t-name"><span class="w slow" style="--d:250ms">${esc(b.text)}</span></p>`; break;
+    case 'name': el.innerHTML = `<p class="t-name" style="--fit:${fitCqw(b.text, 18, 180)}"><span class="w slow" style="--d:250ms">${esc(b.text)}</span></p>`; break;
     case 'plain': {
       const n = wc(b.text);
-      el.innerHTML = `<p class="t-plain">${wordsHTML(b.text, 200, Math.min(D * .45, 260 * n))}</p>`;
-      el.style.setProperty('--y', Math.round((r() - .5) * 18) + 'cqh');
-      if (r() < .3 && n <= 8) el.querySelector('p').style.paddingLeft = '10cqw';
+      el.innerHTML = `<p class="t-plain">${wordsHTML(b.text, 200, Math.min(D * .42, 240 * n))}</p>`;
+      el.style.setProperty('--y', Math.round((r() - .5) * 12) + 'cqh');
+      if (r() < .3 && n <= 8) el.querySelector('p').style.paddingLeft = '8cqw';
       break;
     }
-    case 'weight': { const [lead, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-lead">${wordsHTML(lead, 200, D * .22)}</p><p class="t-weight"><span class="w land" style="--d:${Math.round(D * FRAC.weight)}ms">${esc(em)}</span></p>`; break; }
-    case 'drop': { const [lead, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-plain" style="--y:-6cqh">${wordsHTML(lead, 200, D * .3)}</p><span class="t-drop w slow" style="--d:${Math.round(D * FRAC.drop)}ms">${esc(em)}</span>`; break; }
+    case 'weight': { const [pre, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-lead">${wordsHTML(pre, 200, D * .2)}</p><p class="t-weight" style="--fit:${fitCqw(em, 26, 150)}"><span class="w land" style="--d:${Math.round(D * FRAC.weight)}ms">${esc(em)}</span></p>`; break; }
+    case 'drop': { const [pre, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-plain">${wordsHTML(pre, 200, D * .28)}</p><p class="t-drop"><span class="w fall" style="--d:${Math.round(D * FRAC.drop)}ms">${esc(em)}</span></p>`; break; }
     case 'list': { const it = b.text.split(/,\s*/); el.innerHTML = it.map((s, k) => `<p class="t-item${k === it.length - 1 ? ' last' : ''}" style="--d:${Math.round(ITEM_D(k, it.length, D))}ms">${esc(s)}${k < it.length - 1 ? ',' : ''}</p>`).join(''); break; }
     case 'whisper': el.innerHTML = `<p class="t-whisper"><span class="w slow" style="--d:450ms">${esc(b.text)}</span></p>`; break;
     case 'close': {
@@ -1135,7 +1155,9 @@ function cardLoop(i, soft) {
   const step = j => {
     if (current !== 'preview') return;
     const k = j % bs.length, b = bs[k];
-    if (k === 0 && j > 0) st.innerHTML = '';
+    // At the end of the loop, let the last line dissolve and hold the dark a moment before starting over.
+    if (k === 0 && j > 0 && !step.rested) { st.querySelectorAll('.beat').forEach(o => o.classList.add('out')); step.rested = true; CL = setTimeout(() => step(j), 1800); return; }
+    step.rested = false; if (k === 0) st.innerHTML = '';
     renderBeat(st, b, L, k);
     $$('#pv-beats li').forEach((li, n) => li.classList.toggle('on', n === k));
     $$('#pv-ticks i').forEach((t, n) => { t.className = n < k ? 'done' : n === k ? 'on' : ''; if (n === k) { t.style.setProperty('--dur', b.dur + 'ms'); t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; } });
