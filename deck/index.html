@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kept</title>
+<meta name="description" content="A slower channel for the words worth keeping. A concept deck.">
+<meta property="og:title" content="Kept">
+<meta property="og:description" content="A slower channel for the words worth keeping.">
+<meta property="og:image" content="media/7e036a92e145765e1db517f7df1ebdd5.jpg">
+<meta name="theme-color" content="#100F0E">
+<link rel="icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;display=swap">
+<style>
+/* slide base (matches the Claude Slides viewer) */
+#deck * { margin: 0 }
+#deck { font: 32px/1.2 sans-serif }
+#deck > section { width: 1920px !important; height: 1080px !important; overflow: hidden !important; box-sizing: border-box !important; position: absolute; left: 0; top: 0; isolation: isolate }
+#deck section[hidden], #deck aside, noscript { display: none !important }
+#deck h1 { font-size: 96px; font-weight: 600 }
+#deck h2 { font-size: 64px; font-weight: 600 }
+#deck h3 { font-size: 44px; font-weight: 600 }
+#deck p, #deck li, #deck h1, #deck h2, #deck h3 { overflow-wrap: break-word; text-wrap: pretty }
+#deck figure { margin: 0 }
+</style>
+<style>
+:root {
+  --ink: #100F0E;
+  --ink2: #1A1816;
+  --paper: #F3EEE6;
+  --bone: #EEE7DB;
+  --ember: #CE8B58;
+  --mute-d: #A69D90;
+  --mute-l: #6A635A;
+  --line-d: #3A3631;
+  --line-l: #D6CCBE;
+  --char: #1B1917;
+}
+body { font-family: 'Inter', Arial, sans-serif; }
+section { padding: 128px; box-sizing: border-box; counter-increment: page; }
+section.dark { background: var(--ink); color: var(--bone); }
+section.dark2 { background: var(--ink2); color: var(--bone); }
+section.light { background: var(--paper); color: var(--char); }
+section.accent { background: var(--ember); color: var(--ink); }
+
+.eyebrow { font-family: 'Inter', Arial, sans-serif; font-size: 24px; font-weight: 500; letter-spacing: 6px; color: var(--ember); margin: 0 0 28px 0; }
+.accent .eyebrow { color: var(--ink); }
+.h { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: 72px; line-height: 1.08; margin: 0; }
+.big { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: 120px; line-height: 1.02; margin: 0; }
+.mark { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: 176px; line-height: 1; letter-spacing: 2px; margin: 0; }
+.lede { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 300; font-size: 44px; line-height: 1.25; margin: 0; }
+.body { font-size: 32px; line-height: 1.45; margin: 0; }
+.small { font-size: 24px; line-height: 1.45; margin: 0; }
+.dark .body, .dark2 .body, .dark .small, .dark2 .small { color: var(--mute-d); }
+.light .body, .light .small { color: var(--mute-l); }
+.accent .body, .accent .small { color: #2A1E14; }
+.t3 { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: 44px; line-height: 1.12; margin: 0 0 12px 0; }
+.num { font-size: 24px; font-weight: 500; letter-spacing: 3px; color: var(--ember); margin: 0 0 10px 0; }
+.foot { position: absolute; left: 128px; bottom: 64px; width: 1664px; font-size: 24px; color: var(--mute-d); margin: 0; }
+.light .foot { color: var(--mute-l); }
+
+.ph { border-radius: 30px; border: 5px solid #2B2825; object-fit: cover; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+.light .ph { box-shadow: 0 24px 50px rgba(40,30,20,0.18); }
+
+.row { display: flex; flex-direction: row; gap: 48px; }
+.col { display: flex; flex-direction: column; }
+.grow { flex: 1; }
+
+.rise { animation: rise 0.8s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i) * 120ms); }
+.fadein { animation: fadein 1.2s ease both; animation-delay: calc(var(--i) * 140ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadein { from { opacity: 0; filter: blur(8px); } to { opacity: 1; filter: blur(0px); } }
+
+.card { border-top: 2px solid var(--line-d); padding-top: 28px; }
+.light .card { border-top: 2px solid var(--line-l); }
+.accent .card { border-top: 2px solid rgba(16,15,14,0.35); }
+.rule { border-top: 2px solid var(--line-l); padding: 22px 0 22px 0; }
+.dark2 .rule { border-top: 2px solid var(--line-d); }
+.money { font-size: 28px; color: var(--bone); width: 1664px; }
+.ember { color: var(--ember); }
+
+/* printed feel: each slide sits on a photographed-paper plate, with a fine
+   tooth layer over the ink so type reads as pressed into the stock */
+.tex { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+.grain { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+.ember-deep { color: #A8622F; }
+
+</style>
+<style>
+/* presenter */
+html, body { height: 100%; margin: 0; background: #000; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', Arial, sans-serif; }
+#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+#deck { position: relative; width: 1920px; height: 1080px; transform-origin: 0 0; flex: none; }
+#deck > section { opacity: 0; visibility: hidden; transition: opacity .7s ease, visibility 0s linear .7s; }
+#deck > section.on { opacity: 1; visibility: visible; transition: opacity .7s ease, visibility 0s; z-index: 1; }
+#deck > section:not(.on) .rise, #deck > section:not(.on) .fadein { animation: none; opacity: 0; }
+.vbox { position: relative; display: inline-block; flex: none; cursor: pointer; }
+.vbox > img, .vbox > video { display: block; }
+.vbox video { background: #000; }
+.vplay { position: absolute; left: 50%; top: 50%; width: 132px; height: 132px; margin: -66px 0 0 -66px; border-radius: 50%;
+  background: rgba(16,15,14,.55); border: 2px solid rgba(238,231,219,.75); box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center; transition: transform .25s ease, background .25s ease; pointer-events: none; }
+.vplay::after { content: ""; margin-left: 10px; border-style: solid; border-width: 26px 0 26px 42px; border-color: transparent transparent transparent #EEE7DB; }
+.vbox:hover .vplay { transform: scale(1.06); background: rgba(206,139,88,.7); }
+#ui { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); z-index: 10; opacity: 0; transition: opacity .4s ease; pointer-events: none; }
+body.ui #ui { opacity: 1; pointer-events: auto; }
+#ui button { font: 500 14px/1 'Inter', Arial, sans-serif; color: #EEE7DB; background: rgba(16,15,14,.72); border: 1px solid rgba(238,231,219,.22);
+  border-radius: 999px; height: 40px; min-width: 40px; padding: 0 14px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+#ui button:hover { background: rgba(206,139,88,.85); color: #100F0E; }
+#count { font: 500 13px/1 'Inter', Arial, sans-serif; letter-spacing: 2px; color: #EEE7DB; background: rgba(16,15,14,.72); border-radius: 999px; padding: 13px 16px; }
+#bar { position: fixed; left: 0; top: 0; height: 2px; background: #CE8B58; z-index: 10; transition: width .5s ease; }
+#hint { position: fixed; right: 16px; top: 14px; font: 400 12px/1.4 'Inter', Arial, sans-serif; color: rgba(238,231,219,.55); z-index: 10; transition: opacity 1s ease; pointer-events: none; text-align: right; }
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="hint">Arrow keys, space or tap to move through.<br>F for full screen.</div>
+<div id="stage"><div id="deck">
+<section id="cover" class="dark" data-transition="fade" style="padding:0;">
+<img class="fadein" style="--i:0; position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover;" src="media/7e036a92e145765e1db517f7df1ebdd5.jpg" alt="Kept. A slower channel for the words worth keeping. The hold mark sits above the name, and the whole letter spirals across the slide in printed type out of one warm point of light. A concept to explore together, Tanner and Ben, November 2026.">
+
+</section>
+<section id="problem" class="light" data-transition="fade">
+<img class="tex" src="media/91df2b1963ce2ecb1c4a56ec1d692cdc.jpg" alt="">
+<p class="eyebrow">THE GAP</p>
+<h2 class="big fadein" style="--i:0; width:1600px;">Texts are built<br>to be disposable.</h2>
+<h2 class="big fadein ember-deep" style="--i:2; width:1600px; font-style:italic; margin-top:40px;">Some words are<br>meant to be held.</h2>
+<p class="body fadein" style="--i:5; width:1080px; margin-top:64px;">Most messages move in a constant, furious flow: read, answered, gone. The thank-you you’ve meant to say for a year gets the same gray bubble as “running late.”</p>
+
+</section>
+<section id="idea" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<p class="eyebrow">THE IDEA</p>
+<h2 class="h" style="width:1500px;">Digital, but made to land<br>like a handwritten note.</h2>
+<p class="lede" style="width:1500px; margin-top:32px; color:#CE8B58;">Something felt. Something experienced. Something you can hold on to.</p>
+<div class="row" style="margin-top:84px; gap:64px;">
+<div class="col grow card rise" style="--i:1;">
+<p class="num">01</p>
+<h3 class="t3">Used when it matters</h3>
+<p class="small">Not where you live all day. It’s where you go when something deserves more than a text, from a big birthday to a quiet Tuesday thank-you.</p>
+</div>
+<div class="col grow card rise" style="--i:2;">
+<p class="num">02</p>
+<h3 class="t3">Felt, not skimmed</h3>
+<p class="small">Your words, paced into beats, set in type that moves with them and scored with sound that answers each line. Intentional from the first word.</p>
+</div>
+<div class="col grow card rise" style="--i:3;">
+<p class="num">03</p>
+<h3 class="t3">Yours to hold</h3>
+<p class="small">Every message lives on a shelf to replay or answer in kind, and can be ordered as a print to frame and keep.</p>
+</div>
+</div>
+
+</section>
+<section id="ben" class="dark2" data-transition="fade">
+<img class="tex" src="media/08a4d980ee3ce3846e02243344d36f50.jpg" alt="">
+<p class="eyebrow">WHERE THIS STARTED</p>
+<h2 class="h">Type is the image.</h2>
+<div class="row" style="margin-top:56px; gap:56px; align-items:flex-start;">
+<div class="col" style="width:520px;">
+<p class="body">Ben’s current exploration, in his words: “pacing and dynamic layouts,” lettering doing the work when there’s no picture, and text-heavy pieces that don’t “feel like a lot to read.”</p>
+<p class="body" style="margin-top:32px; color:#EEE7DB;">Kept gives that craft a product to live in.</p>
+</div>
+<img class="ph rise" style="--i:1; width:322px; height:572px;" src="media/764288280e92e251290ebf088d637a8e.jpg" alt="A dozen versions: eleven struck-through openings to Jonah, then So I’m saying it slower, with slower spaced out in amber">
+<img class="ph rise" style="--i:2; width:322px; height:572px;" src="media/af9dac8105618e926bf3cb5462525891.jpg" alt="Carried: a dense block of everything he carried in tiny capitals, resting on one huge amber italic You">
+<img class="ph rise" style="--i:3; width:322px; height:572px;" src="media/d03af25fd6411231bfa674affb42e97c.jpg" alt="Cover: rings of tiny amber words, the early trains, the late dinners, the porch light, still on, circling a glowing point, above For Jonah">
+</div>
+
+</section>
+<section id="scenes" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<p class="eyebrow">THE MOMENT, ON BOTH ENDS</p>
+<div class="row" style="gap:72px; align-items:center; margin-top:8px;">
+<div class="col" style="width:480px;">
+<p class="num" style="margin:0 0 14px 0;">THURSDAY, 11:40 PM</p>
+<h2 class="h" style="font-size:56px; line-height:1.1;">Written at the<br>hardest hour.</h2>
+<p class="small" style="margin-top:20px;">She finally writes what she couldn’t say out loud, then holds to seal it for Sunday morning.</p>
+</div>
+<img class="fadein" style="--i:1; width:540px; height:304px; object-fit:cover; border-radius:6px;" src="media/18c9c05829c55b9f9647fe43e288b49f.jpg" alt="A woman alone at a kitchen table late at night, rain on the window, writing on her phone with red eyes and a steady face">
+<img class="fadein" style="--i:2; width:540px; height:304px; object-fit:cover; border-radius:6px;" src="media/a3fc4bec49f2db5ef0ada90f1ffffb2f.jpg" alt="Close-up of her thumb pressing a glowing amber circle on a dark phone screen that reads Kept, sealed for Sunday, 7:30 AM, her other hand at her mouth">
+</div>
+<div class="row" style="gap:72px; align-items:center; margin-top:64px;">
+<img class="fadein" style="--i:3; width:540px; height:304px; object-fit:cover; border-radius:6px;" src="media/438de8517998d14e6392728a6d9b2e3b.jpg" alt="Over his shoulder in golden morning light: his phone shows rings of tiny amber words around a glowing point, above For Jonah">
+<img class="fadein" style="--i:4; width:540px; height:304px; object-fit:cover; border-radius:6px;" src="media/55a2336d45ba4342b6f3b2cdf3bdfd34.jpg" alt="The same man, eyes wet, hand at his mouth, holding up his phone where I NOTICED glows amber inside a field of tiny text">
+<div class="col" style="width:480px;">
+<p class="num" style="margin:0 0 14px 0;">SUNDAY, 8:15 AM</p>
+<h2 class="h" style="font-size:56px; line-height:1.1;">Opened when<br>they’re ready.</h2>
+<p class="small" style="margin-top:20px;">The first thing he sees is her words, circling a light. He holds it, and they arrive at her pace.</p>
+</div>
+</div>
+
+</section>
+<section id="moment" class="dark" data-transition="fade" style="padding:0;">
+<img style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover;" src="media/9b8787e968f5901191057a1194126855.jpg" data-video="media/kept-film.mp4" data-video-sound="on" data-video-start="click" alt="About a 75-second film: Iris writes late at night in the rain and seals her message; on Sunday morning Jonah opens it, her whole message plays line by line at her pace, and he is moved to tears">
+
+</section>
+<section id="sender" class="light" data-transition="fade">
+<img class="tex" src="media/91df2b1963ce2ecb1c4a56ec1d692cdc.jpg" alt="">
+<p class="eyebrow">SENDING</p>
+<h2 class="h">Writing it is the only hard part.</h2>
+<div class="row" style="margin-top:48px; gap:48px;">
+<div class="col grow rise" style="--i:1;">
+<img class="ph" style="width:281px; height:500px;" src="media/1dece455340082a6f6e43159004474e1.jpg" alt="Compose screen with a plain serif message to Jonah and a prompt to say it out loud">
+<p class="num" style="margin-top:28px;">01</p>
+<p class="small" style="color:#1B1917;"><b>Write or say it.</b> No templates, no prompts to sound like someone else.</p>
+</div>
+<div class="col grow rise" style="--i:2;">
+<img class="ph" style="width:281px; height:500px;" src="media/919d8c64820883973d9e0da622b52689.jpg" alt="Pacing screen listing twelve beats with timings, one beat held longer">
+<p class="num" style="margin-top:28px;">02</p>
+<p class="small" style="color:#1B1917;"><b>It finds the pauses.</b> AI suggests beats and holds. It never rewrites a word.</p>
+</div>
+<div class="col grow rise" style="--i:3;">
+<img class="ph" style="width:281px; height:500px;" src="media/8d91e869a61c6e16320988a95d449579.png" alt="Preview screen titled Composed for you: one dark card setting This year was heavy in large serif type, a line saying it was set for what was written, and small options to make it warmer, quieter or simpler">
+<p class="num" style="margin-top:28px;">03</p>
+<p class="small" style="color:#1B1917;"><b>It composes the rest.</b> Type, motion and score, set for what you wrote.</p>
+</div>
+<div class="col grow rise" style="--i:4;">
+<img class="ph" style="width:281px; height:500px;" src="media/5dabcffa37aa51c29807b4a29e9d7fc6.jpg" alt="Deliver screen set to Sunday 7:30 AM with a hold-to-seal button">
+<p class="num" style="margin-top:28px;">04</p>
+<p class="small" style="color:#1B1917;"><b>Seal it for a moment.</b> Now, or Sunday morning. Sealed until it’s opened.</p>
+</div>
+</div>
+
+</section>
+<section id="receiver" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<p class="eyebrow">RECEIVING</p>
+<h2 class="h">Opening it feels like an occasion.</h2>
+<div class="row" style="margin-top:48px; gap:48px;">
+<div class="col grow rise" style="--i:1;">
+<img class="ph" style="width:281px; height:500px;" src="media/06064b0d74e16002603d4221686e81c9.jpg" alt="Lock screen at 7:30 with one notification from Kept: Iris sent you something to hear slowly">
+<p class="num" style="margin-top:28px;">01</p>
+<p class="small"><b style="color:#EEE7DB;">A quiet arrival.</b> One line: find a quiet minute, headphones help.</p>
+</div>
+<div class="col grow rise" style="--i:2;">
+<img class="ph" style="width:281px; height:500px;" src="media/d03af25fd6411231bfa674affb42e97c.jpg" alt="Cover screen: rings of tiny amber words, the early trains, the late dinners, the porch light, still on, circling a glowing point, above For Jonah">
+<p class="num" style="margin-top:28px;">02</p>
+<p class="small"><b style="color:#EEE7DB;">A cover made of the words.</b> The message’s own image comes first. Hold the light to open.</p>
+</div>
+<div class="col grow rise" style="--i:3;">
+<img class="ph" style="width:281px; height:500px;" src="media/757d291ee7349209e78f8ba6915f8019.jpg" alt="Playback beat: the whole letter in tiny type fills the screen, with I NOTICED lit in amber inside it">
+<p class="num" style="margin-top:28px;">03</p>
+<p class="small"><b style="color:#EEE7DB;">Paced playback.</b> Type, rhythm and sound move together. No skipping ahead.</p>
+</div>
+<div class="col grow rise" style="--i:4;">
+<img class="ph" style="width:281px; height:500px;" src="media/f56f4c5d8bcb4bb0fb089769ebb26274.jpg" alt="End screen with the hold mark and options Replay, Keep it, Reply in kind, Order a print">
+<p class="num" style="margin-top:28px;">04</p>
+<p class="small"><b style="color:#EEE7DB;">Keep, reply, print.</b> It goes on a shelf, not into a feed.</p>
+</div>
+</div>
+
+</section>
+<section id="print" class="light" data-transition="fade">
+<img style="position:absolute; left:0; top:0; width:1920px; height:1080px; object-fit:cover;" src="media/ad04f79d04a11265d946fa92ffeb6b77.jpg" alt="A gallery wall under warm track lights: three black frames with white mats hang level, holding the porch light rings on black, the whole letter with I noticed drawn inside it, and the hold sign made of thank-yous above I’d choose you again, each with a small museum label">
+<p class="eyebrow">TO HOLD ON TO</p>
+<h2 class="h" style="width:1600px;">Every Kept message can become a print.</h2>
+<p class="body" style="width:1300px; margin-top:24px;">The cover and the beats are already made of type, so they print like letterpress. One tap orders a framed keepsake, or a card to tuck into a drawer.</p>
+
+</section>
+<section id="grammar" class="dark2" data-transition="fade" style="padding:128px 128px 160px;">
+<img class="tex" src="media/08a4d980ee3ce3846e02243344d36f50.jpg" alt="">
+<p class="eyebrow">THE CRAFT</p>
+<h2 class="h">A typographic grammar for feelings.</h2>
+<div class="row" style="margin-top:48px; gap:72px; align-items:flex-start;">
+<div class="col grow">
+<div class="rule rise" style="--i:1;"><h3 class="t3">Size is volume.</h3><p class="small">“heavy.” lands at 250 pixels. “small.” at 34.</p></div>
+<div class="rule rise" style="--i:2;"><h3 class="t3">Space is silence.</h3><p class="small">A pause is empty screen, held on the beat of the score.</p></div>
+<div class="rule rise" style="--i:3;"><h3 class="t3"><i>Italic is the voice softening.</i></h3><p class="small">For the lines you’d say quietly.</p></div>
+<div class="rule rise" style="--i:4;"><h3 class="t3" style="font-weight:600;">Weight is weight.</h3><p class="small">Bold is saved for the word that carries the message.</p></div>
+</div>
+<img class="ph rise" style="--i:2; width:300px; height:533px;" src="media/73214e3f2493bc10ddf3ade0e050f271.jpg" alt="Three moods setting This year was heavy in different type: Linen, Vesper and Signal">
+<img class="ph rise" style="--i:3; width:300px; height:533px;" src="media/ce8e948d0861a6fb34e601ce7cfd811d.jpg" alt="Heavy: THIS YEAR WAS HEAVY, each word heavier and larger than the last until HEAVY in amber hits the bottom edge">
+</div>
+<p class="foot">Moods are the product. Vesper, Linen and Signal are placeholders for Ben to design.</p>
+
+</section>
+<section id="broadside" class="dark2" data-transition="fade">
+<img class="tex" src="media/08a4d980ee3ce3846e02243344d36f50.jpg" alt="">
+<p class="eyebrow">A FOURTH MOOD: BROADSIDE</p>
+<h2 class="h" style="width:1600px; font-size:64px;">Type as image.<br>Every beat is a picture made only of letters.</h2>
+<div class="row" style="margin-top:56px; gap:32px; align-items:flex-start;">
+<figure class="rise" style="--i:1; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/764288280e92e251290ebf088d637a8e.jpg" alt="Broadside beat: A dozen versions. Eleven drafts struck through. The twelfth gets sent."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">A DOZEN VERSIONS</p><p class="small" style="font-size:21px; line-height:1.4;">Eleven drafts struck through. The twelfth gets sent.</p></figcaption></figure>
+<figure class="rise" style="--i:2; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/ce8e948d0861a6fb34e601ce7cfd811d.jpg" alt="Broadside beat: Heavy. The words get heavier until the last one hits the floor."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">HEAVY</p><p class="small" style="font-size:21px; line-height:1.4;">The words get heavier until the last one hits the floor.</p></figcaption></figure>
+<figure class="rise" style="--i:3; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/af9dac8105618e926bf3cb5462525891.jpg" alt="Broadside beat: Carried. Everything he carried, stacked on one small word."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">CARRIED</p><p class="small" style="font-size:21px; line-height:1.4;">Everything he carried, stacked on one small word.</p></figcaption></figure>
+<figure class="rise" style="--i:4; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/ae0a6022a22130c888b331f51232997f.jpg" alt="Broadside beat: The porch light. The details circle a single light."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">THE PORCH LIGHT</p><p class="small" style="font-size:21px; line-height:1.4;">The details circle a single light.</p></figcaption></figure>
+<figure class="rise" style="--i:5; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/fdfcbe08cbfd9f9c2cc8ba31b8feda6a.jpg" alt="Broadside beat: All of it. The whole letter, with I NOTICED drawn inside it."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">ALL OF IT</p><p class="small" style="font-size:21px; line-height:1.4;">The whole letter, with I NOTICED drawn inside it.</p></figcaption></figure>
+<figure class="rise" style="--i:6; margin:0; width:250px;"><img class="ph" style="width:250px; height:444px; border-radius:22px; border-width:4px;" src="media/8ede0350e848cc9abb608ea04d05d486.jpg" alt="Broadside beat: Held. The hold sign, built out of thank-yous."><figcaption style="margin-top:20px;"><p class="num" style="margin:0 0 6px 0;">HELD</p><p class="small" style="font-size:21px; line-height:1.4;">The hold sign, built out of thank-yous.</p></figcaption></figure>
+</div>
+
+</section>
+<section id="ai" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<p class="eyebrow">CAN THE AI DO THIS ON ITS OWN?</p>
+<h2 class="h" style="width:1100px;">Yes, within rules a designer sets.</h2>
+<div class="row" style="margin-top:44px; gap:72px; align-items:flex-start;">
+<div class="col" style="width:900px;">
+<div class="rule rise" style="--i:1;"><p class="num">01  ·  READ</p><p class="small">It reads the message for its one concrete image and the phrase that carries it. In Iris’s letter: <span class="ember">the porch light, still on</span> and <span class="ember">I noticed</span>.</p></div>
+<div class="rule rise" style="--i:2;"><p class="num">02  ·  CHOOSE</p><p class="small">It picks a move from the mood’s own library: words circling a light, a phrase drawn inside the whole letter, a stack that gets heavier, a word set tiny.</p></div>
+<div class="rule rise" style="--i:3;"><p class="num">03  ·  COMPOSE</p><p class="small">It builds the cover from the message’s own words, paces the beats and cues the sound. It never adds, cuts or rewrites a word.</p></div>
+<div class="rule rise" style="--i:4;"><p class="num">04  ·  SHOW</p><p class="small">The sender sees it composed first. If it doesn’t land, a light nudge (warmer, quieter, simpler) recomposes it before it’s sealed.</p></div>
+</div>
+<img class="ph rise" style="--i:2; width:300px; height:533px;" src="media/d03af25fd6411231bfa674affb42e97c.jpg" alt="Cover screen built from the message: rings of tiny amber words circling a glowing point, above For Jonah">
+<img class="ph rise" style="--i:3; width:300px; height:533px;" src="media/757d291ee7349209e78f8ba6915f8019.jpg" alt="Beat built from the message: the whole letter in tiny type, with I NOTICED lit in amber inside it">
+</div>
+<p class="foot">The guardrails are the mood: its typefaces, palette, allowed moves, timing rules and sound palette. Taste stays with the designer.</p>
+
+</section>
+<section id="sound" class="dark2" data-transition="fade">
+<img class="tex" src="media/08a4d980ee3ce3846e02243344d36f50.jpg" alt="">
+<p class="eyebrow">SOUND IS HALF THE MESSAGE</p>
+<h2 class="h" style="width:1500px;">A sound engine that listens to the words.</h2>
+<p class="body" style="width:1400px; margin-top:24px;">Each mood has its own palette of music and texture. The engine reads what’s written and places sound where the words and images land, so you feel a line before you’ve finished reading it.</p>
+<div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:0 28px; margin-top:64px;">
+<div class="card rise" style="--i:1;"><p class="t3" style="font-size:40px;">heavy.</p><p class="small" style="font-size:21px;">A low swell, and the music breathes out.</p></div>
+<div class="card rise" style="--i:2;"><p class="t3" style="font-size:40px;">the early trains</p><p class="small" style="font-size:21px;">A far-off rumble on the rails.</p></div>
+<div class="card rise" style="--i:3;"><p class="t3" style="font-size:40px;">the late dinners</p><p class="small" style="font-size:21px;">One glass, set down.</p></div>
+<div class="card rise" style="--i:4;"><p class="t3 ember" style="font-size:40px;">still on.</p><p class="small" style="font-size:21px;">Night crickets and a warm filament hum.</p></div>
+<div class="card rise" style="--i:5;"><p class="t3" style="font-size:40px;">I noticed.</p><p class="small" style="font-size:21px;">Paper rustle as the letter fills, bells as the words light.</p></div>
+<div class="card rise" style="--i:6;"><p class="t3" style="font-size:40px;"><i>Thank you.</i></p><p class="small" style="font-size:21px;">Everything holds its breath. One low note.</p></div>
+</div>
+<div class="row" style="margin-top:64px; gap:72px;">
+<p class="small rise" style="--i:7; width:520px;"><b style="color:#EEE7DB;">It follows the words.</b> Sound reinforces what’s written. It never narrates or adds a feeling that isn’t there.</p>
+<p class="small rise" style="--i:8; width:520px;"><b style="color:#EEE7DB;">Silence is a cue too.</b> The engine makes room for the line that matters most.</p>
+<p class="small rise" style="--i:9; width:520px;"><b style="color:#EEE7DB;">Built from a palette.</b> Designed stems and small cues per mood, mixed live to the pacing.</p>
+</div>
+
+</section>
+<section id="film" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<div class="row" style="height:824px; align-items:center; gap:96px;">
+<div class="col grow">
+<p class="eyebrow">THE DEMO</p>
+<h2 class="h" style="width:820px;">Sending and receiving,<br>in 92 seconds.</h2>
+<p class="body" style="width:820px; margin-top:36px;">A fictional message from Iris to Jonah. First the sender’s four steps, then Sunday morning on his phone: the notification, a cover made of her words, the paced playback and the shelf. The music rises with the words that matter.</p>
+<p class="small" style="width:820px; margin-top:36px;">Click the phone to play. Watch with sound, ideally on headphones.</p>
+</div>
+<img class="ph rise" style="--i:1; width:450px; height:800px;" src="media/8b2bef65a9ee11cd2f85f7afbfdc774f.jpg" data-video="media/kept-demo.mp4" data-video-sound="on" data-video-start="click" alt="Demo film: a message written and paced, then composed by Kept on its own, with a light nudge offered only if it misses, and sealed; then received, opened from a cover of rings of words, and played back as moving type with sound">
+</div>
+
+</section>
+<section id="occasions" class="light" data-transition="fade">
+<img class="tex" src="media/91df2b1963ce2ecb1c4a56ec1d692cdc.jpg" alt="">
+<p class="eyebrow">WHO SENDS ONE</p>
+<h2 class="h" style="width:1500px;">For the messages people<br>rewrite a dozen times.</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:56px 64px; margin-top:72px;">
+<div class="card rise" style="--i:1;"><h3 class="t3">Partners</h3><p class="small">Anniversaries, long distance, the night before a big move.</p></div>
+<div class="card rise" style="--i:2;"><h3 class="t3">Family</h3><p class="small">A graduation, a new baby, a parent’s seventieth.</p></div>
+<div class="card rise" style="--i:3;"><h3 class="t3">Apologies</h3><p class="small">When sorry needs more room than a text gives it.</p></div>
+<div class="card rise" style="--i:4;"><h3 class="t3">Thank-yous</h3><p class="small">The mentor, the nurse, the teacher who noticed.</p></div>
+<div class="card rise" style="--i:5;"><h3 class="t3">Big days</h3><p class="small">Vows and toasts, made to play on the big screen.</p></div>
+<div class="card rise" style="--i:6;"><h3 class="t3">Goodbyes</h3><p class="small">A farewell to a team, a letter to a grandparent.</p></div>
+</div>
+
+</section>
+<section id="model" class="dark" data-transition="fade">
+<img class="tex" src="media/0c547cc5535e97248b92b123a5fe36e2.jpg" alt="">
+<p class="eyebrow">HOW IT SUSTAINS ITSELF</p>
+<h2 class="big fadein" style="--i:0; width:1600px; font-size:104px;">Free to receive.</h2>
+<h2 class="big fadein" style="--i:1; width:1600px; font-size:104px; font-style:italic; color:#CE8B58;">Worth paying to send.</h2>
+<div class="row" style="margin-top:88px; gap:64px;">
+<div class="col grow card rise" style="--i:3;">
+<p class="num">01</p>
+<h3 class="t3">Opening one is<br>always a gift</h3>
+<p class="small">The person it’s for never meets a paywall. Every message delivered is someone discovering the medium.</p>
+</div>
+<div class="col grow card rise" style="--i:4;">
+<p class="num">02</p>
+<h3 class="t3">Sending is the occasion</h3>
+<p class="small">People already pay for the card, the frame, the flowers. A message made this carefully belongs in that company.</p>
+</div>
+<div class="col grow card rise" style="--i:5;">
+<p class="num">03</p>
+<h3 class="t3">Deeper layers for<br>bigger moments</h3>
+<p class="small">An original score, a voice, a keepsake to hold. Richer craft for the days that ask for it.</p>
+</div>
+</div>
+<p class="foot">Most of every message is drawn by design rather than generated, so the craft stays light to make and easy to give.</p>
+
+</section>
+<section id="whyus" class="dark2" data-transition="fade">
+<img class="tex" src="media/08a4d980ee3ce3846e02243344d36f50.jpg" alt="">
+<p class="eyebrow">WHY NOW, WHY US</p>
+<div class="row" style="gap:120px; margin-top:12px;">
+<div class="col" style="width:760px;">
+<h2 class="h" style="font-size:72px;">Why now</h2>
+<div class="rule rise" style="--i:1; margin-top:36px;"><h3 class="t3">AI can do<br>the choreography.</h3><p class="small">Pacing a message used to take a motion designer and a day. Now it takes seconds, inside rules a designer sets.</p></div>
+<div class="rule rise" style="--i:2;"><h3 class="t3">Messaging is fast and flat.</h3><p class="small">Everything lands in the same bubble, so a slower channel stands out.</p></div>
+<div class="rule rise" style="--i:3;"><h3 class="t3">Beautiful delivery<br>is already loved.</h3><p class="small">People keep designed invitations and cards long after the day.</p></div>
+</div>
+<div class="col grow">
+<h2 class="h" style="font-size:72px;"><i>Why us</i></h2>
+<p class="lede rise" style="--i:2; margin-top:44px;">A Kept message lives or dies on three things at once: type that feels set by hand, timing that feels like someone breathing, and sound that answers the words.</p>
+<p class="body rise" style="--i:3; margin-top:36px;">That isn’t a design job handed to an engineering job. The moods, the pacing, the sound and the player that performs them have to grow up together, argued over by two people who care about the same moment.</p>
+<p class="body rise" style="--i:4; margin-top:28px; color:#EEE7DB;">Templates are easy to copy. A voice, in type and in time, is not.</p>
+</div>
+</div>
+
+</section>
+<section id="next" class="accent" data-transition="fade">
+<img class="tex" src="media/2d86441326948903575b28bf880c2634.jpg" alt="">
+<p class="eyebrow">TO EXPLORE TOGETHER</p>
+<h2 class="h" style="width:1560px;">Five real messages, made by hand,<br>watched being opened.</h2>
+<p class="body" style="width:1300px; margin-top:32px;">Before any app: hand-make five Kept messages for friends who have something to say, in one mood with one sound palette. Watch them open it. Ask what they did next.</p>
+<div class="row" style="margin-top:72px; gap:64px;">
+<div class="col grow card"><h3 class="t3">For Ben</h3><p class="small">What’s the first mood you’d design? Should a receiver ever skip ahead? Does the sender hear the score while writing?</p></div>
+<div class="col grow card"><h3 class="t3">For both</h3><p class="small">Kept is the working name: what should its mark and its first sound feel like? And which moment do we test first: partners or thank-yous?</p></div>
+</div>
+
+</section>
+</div></div>
+<div id="ui">
+  <button id="prev" aria-label="Previous slide">&#8592;</button>
+  <span id="count"></span>
+  <button id="next" aria-label="Next slide">&#8594;</button>
+  <button id="fs" aria-label="Full screen">Full screen</button>
+</div>
+<script>
+(() => {
+  const deck = document.getElementById('deck');
+  const slides = [...deck.querySelectorAll(':scope > section')].filter(s => !s.hidden);
+  const count = document.getElementById('count'), bar = document.getElementById('bar');
+  let cur = -1;
+
+  // pinned children listed before a slide's first flow child sit behind its flow content
+  slides.forEach(s => {
+    for (const el of s.children) {
+      if (getComputedStyle(el).position === 'absolute') el.style.zIndex = '-1';
+      else break;
+    }
+  });
+
+  // videos: the poster image becomes a click-to-play box, the film plays in place with controls and sound
+  deck.querySelectorAll('img[data-video]').forEach(img => {
+    const box = document.createElement('div');
+    box.className = 'vbox';
+    const st = img.getAttribute('style') || '';
+    const pinned = /position\s*:\s*absolute/.test(st);
+    if (pinned) { box.style.cssText = 'position:absolute; left:0; top:0; width:1920px; height:1080px;'; }
+    // carry layout classes (rise etc.) and the animation index to the box
+    box.className += ' ' + [...img.classList].filter(c => c !== 'ph').join(' ');
+    const i = img.style.getPropertyValue('--i'); if (i) box.style.setProperty('--i', i);
+    img.classList.remove('rise', 'fadein');
+    img.parentNode.insertBefore(box, img);
+    box.appendChild(img);
+    const play = document.createElement('div'); play.className = 'vplay'; box.appendChild(play);
+    box.setAttribute('role', 'button'); box.setAttribute('aria-label', 'Play film');
+    box.addEventListener('click', e => {
+      e.stopPropagation();
+      if (box.querySelector('video')) return;
+      const v = document.createElement('video');
+      v.src = img.dataset.video; v.controls = true; v.playsInline = true; v.preload = 'auto';
+      v.setAttribute('playsinline', '');
+      v.className = img.className;
+      v.style.cssText = st; v.style.objectFit = 'contain';
+      if (pinned) { v.style.position = 'absolute'; }
+      img.replaceWith(v); play.remove();
+      box.style.cursor = 'default';
+      v.addEventListener('click', ev => ev.stopPropagation());
+      v.play().catch(() => {});
+    });
+  });
+
+  function stopVideos(s) {
+    s.querySelectorAll('video').forEach(v => v.pause());
+  }
+
+  function go(n, fromHash) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === cur) return;
+    if (cur >= 0) { stopVideos(slides[cur]); slides[cur].classList.remove('on'); }
+    const s = slides[n];
+    void s.offsetWidth; // restart the arrival animations
+    s.classList.add('on');
+    cur = n;
+    count.textContent = (n + 1) + ' / ' + slides.length;
+    bar.style.width = ((n + 1) / slides.length * 100) + '%';
+    if (!fromHash) history.replaceState(null, '', '#' + (n + 1));
+  }
+  const next = () => go(cur + 1), prev = () => go(cur - 1);
+
+  function fit() {
+    const w = innerWidth, h = innerHeight, k = Math.min(w / 1920, h / 1080);
+    deck.style.transform = 'scale(' + k + ')';
+    deck.style.width = '1920px'; deck.style.height = '1080px';
+    deck.parentNode.style.cssText = '';
+    deck.style.position = 'absolute';
+    deck.style.left = ((w - 1920 * k) / 2) + 'px';
+    deck.style.top = ((h - 1080 * k) / 2) + 'px';
+  }
+  addEventListener('resize', fit); fit();
+
+  function fullscreen() {
+    const d = document, el = d.documentElement;
+    if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    else (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el);
+  }
+
+  addEventListener('keydown', e => {
+    if (e.target.tagName === 'VIDEO' && (e.key === ' ' || e.key.startsWith('Arrow'))) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'n'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace', 'p'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') fullscreen();
+  });
+
+  // tap or click: right two thirds goes forward, left third goes back
+  document.getElementById('stage').addEventListener('click', e => {
+    if (e.target.closest('.vbox, video')) return;
+    (e.clientX < innerWidth / 3 ? prev : next)();
+  });
+  let sx = null, sy = null;
+  addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      if (!e.target.closest('video')) (dx < 0 ? next : prev)();
+      e.preventDefault();
+    }
+    sx = null;
+  });
+
+  document.getElementById('prev').addEventListener('click', e => { e.stopPropagation(); prev(); });
+  document.getElementById('next').addEventListener('click', e => { e.stopPropagation(); next(); });
+  document.getElementById('fs').addEventListener('click', e => { e.stopPropagation(); fullscreen(); });
+  if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) document.getElementById('fs').style.display = 'none';
+
+  // controls show on mouse movement, then fade away
+  let t;
+  const wake = () => { document.body.classList.add('ui'); clearTimeout(t); t = setTimeout(() => document.body.classList.remove('ui'), 2400); };
+  addEventListener('mousemove', wake); addEventListener('touchstart', wake, { passive: true }); wake();
+  setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 5000);
+
+  const fromHash = () => { const n = parseInt(location.hash.slice(1), 10); go(isNaN(n) ? 0 : n - 1, true); };
+  addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>
