@@ -18,7 +18,7 @@
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600;800&display=swap">
 <style>
 /* Layout: one phone-width column of stacked full-screen screens. Paper for the sender, low light for the receiver. One committed look, not themed. */
 :root{
@@ -28,14 +28,25 @@
   --serif:'Fraunces','Iowan Old Style',Georgia,serif;
   --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --ground:#F3EEE6; --grain-l:none; --grain-d:none;
+  --settle:cubic-bezier(.16,1,.3,1); --ease:cubic-bezier(.33,0,.2,1);
   color-scheme:light;
 }
-html{height:100%;box-sizing:border-box;background:var(--ground);transition:background-color .5s}
+html{height:100%;box-sizing:border-box;background:var(--ground);transition:background-color .9s var(--ease)}
 body{height:100%;margin:0;background:var(--ground);color:var(--char);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+/* Native feel: the page itself never scrolls, bounces, zooms or selects. Only fields and the link take a selection. */
+html,body{overscroll-behavior:none}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg{-webkit-user-drag:none}
+/* Pressed state: a small give under the finger, released with a settle. */
+.tap{transition:scale .45s var(--settle),opacity .45s var(--settle)}
+.tap.pressed{scale:.965;opacity:.82;transition-duration:.12s}
+.bar .tap.pressed,.linkish.pressed,.pctl .tap.pressed,.closex.pressed,.shelfbtn.pressed,.back.pressed,.pacebtn.pressed{scale:1;opacity:.4}
+.end .acts .tap.pressed,.rowitem.pressed{scale:1;opacity:.55}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ember);outline-offset:3px;border-radius:6px}
-#app{position:relative;height:100%;width:100%;max-width:520px;margin:0 auto;overflow:hidden;background:var(--paper)}
+#app{position:relative;height:100%;width:100%;max-width:520px;margin:0 auto;overflow:hidden;background:var(--ground);transition:background-color .9s var(--ease)}
 .desk-note{display:none}
 @media (min-width:760px) and (min-height:720px){
   html,body{background:var(--surround)}
@@ -45,8 +56,23 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 }
 
 /* screens */
-.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;animation:scrIn .5s ease both}
-@keyframes scrIn{from{opacity:0}to{opacity:1}}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+/* Screen changes: the old screen lifts away and fades, the new one rises a few pixels and settles.
+   Paper to dark goes through a short dim instead of a crossfade, like a room light going down. */
+.scr.entering{z-index:3;animation:scrIn var(--td,.64s) var(--settle) var(--tdl,0s) backwards}
+.scr.entering[data-dir="back"]{animation-name:scrInBack}
+.scr.leaving{z-index:2;pointer-events:none;animation:scrOut var(--to,.42s) var(--ease) forwards}
+.scr.leaving[data-dir="back"]{animation-name:scrOutBack}
+@keyframes scrIn{from{opacity:0;transform:translate3d(0,16px,0) scale(.992)}}
+@keyframes scrInBack{from{opacity:0;transform:translate3d(0,-10px,0) scale(1.004)}}
+@keyframes scrOut{to{opacity:0;transform:translate3d(0,-10px,0) scale(.994)}}
+@keyframes scrOutBack{to{opacity:0;transform:translate3d(0,12px,0)}}
+.scr.entering .stagger>*:not(.own){animation:rise .9s var(--settle) backwards;animation-delay:calc(var(--tdl,0s) + 90ms + var(--si,0) * 65ms)}
+.stagger>:nth-child(2){--si:1}.stagger>:nth-child(3){--si:2}.stagger>:nth-child(4){--si:3}.stagger>:nth-child(5){--si:4}
+.stagger>:nth-child(6){--si:5}.stagger>:nth-child(7){--si:6}.stagger>:nth-child(8){--si:7}.stagger>:nth-child(n+9){--si:8}
+@keyframes rise{from{opacity:0;transform:translate3d(0,10px,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translate3d(0,8px,0)}}
+@keyframes fadeAway{to{opacity:0;transform:translate3d(0,4px,0)}}
 .paper{background:var(--paper);color:var(--char)}
 .paper::after,.dark::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
 .paper::after{background-image:var(--grain-l);background-size:220px;mix-blend-mode:multiply;opacity:.55}
@@ -121,36 +147,64 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .foot .wc{font-size:13px;color:var(--mute-l);font-variant-numeric:tabular-nums;white-space:nowrap}
 .linkish{color:var(--ember-deep);font-size:14px;font-weight:500;padding:10px 0}
 
-/* preview */
-.pv{padding-block:24px 36px;display:flex;flex-direction:column;gap:18px}
-.pv h2{font-size:32px;margin:0;line-height:1.1}
-.card{position:relative;border-radius:24px;padding:5px;background:linear-gradient(160deg,#D99A66,#A8622F);box-shadow:0 18px 40px rgba(40,28,18,.2)}
-.card .stage{border-radius:20px;aspect-ratio:4/5;width:100%}
-.card .meta{position:absolute;left:24px;right:24px;bottom:20px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;z-index:5;font-size:13px;pointer-events:none}
-.card .meta b{font-weight:500;font-size:15px}
-.card .meta span{opacity:.7}
-.card.dawnish .meta{color:var(--char)}
-.card:not(.dawnish) .meta{color:var(--bone)}
-.composing{position:absolute;inset:5px;border-radius:20px;background:#13110F;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:6;text-align:center;padding:24px}
+/* preview: one hero card that fills the screen, quiet controls under it */
+.pv{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;padding-block:14px 14px}
+.card{position:relative;flex:1;min-height:300px;border-radius:26px;box-shadow:0 1px 0 rgba(255,255,255,.5),0 22px 48px -12px rgba(40,28,18,.38),0 0 0 1px rgba(27,25,23,.06);transition:transform .5s var(--settle)}
+.card .stage{position:absolute;inset:0;border-radius:26px;transition:opacity .4s var(--ease),background-color .9s var(--ease)}
+.card .stage.fading{opacity:0}
+.ticks{position:absolute;left:18px;right:18px;top:16px;z-index:5;display:flex;gap:3px;height:2px;pointer-events:none}
+.ticks i{position:relative;display:block;height:100%;border-radius:2px;background:currentColor;opacity:.22;overflow:hidden}
+.ticks i.done{opacity:.6}
+.ticks i.on{opacity:1;background:transparent}
+.ticks i.on::before{content:"";position:absolute;inset:0;background:currentColor;opacity:.22}
+.ticks i.on::after{content:"";position:absolute;inset:0;background:var(--ember);transform-origin:left;animation:tick var(--dur,3s) linear both}
+@keyframes tick{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.card .meta{position:absolute;left:20px;right:20px;bottom:18px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;z-index:5;font-size:12.5px;pointer-events:none;transition:color .9s var(--ease)}
+.card .meta b{font-family:var(--serif);font-style:italic;font-weight:300;font-size:18px;font-variation-settings:"opsz" 72}
+.card .meta span{opacity:.62;letter-spacing:.01em}
+.card.dawnish .meta,.card.dawnish .ticks{color:var(--char)}
+.card:not(.dawnish) .meta,.card:not(.dawnish) .ticks{color:var(--bone)}
+.composing{position:absolute;inset:0;border-radius:26px;background:#13110F;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:6;text-align:center;padding:24px}
 .composing .arc{width:54px;height:33px;animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.35;transform:scale(.94)}}
 .composing .line{font-family:var(--serif);font-style:italic;font-weight:300;font-size:21px;min-height:1.4em}
-.nudges{display:flex;flex-wrap:wrap;gap:8px}
-.nudge{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line-l);font-size:14.5px;color:var(--char);background:rgba(255,255,255,.25)}
+.composing{transition:opacity .9s var(--ease),visibility 0s .9s}
+.composing.gone{opacity:0;visibility:hidden}
+.composing .line{transition:opacity .45s var(--ease)}
+.composing .line.swap{opacity:0}
+.nudges{flex:none;display:flex;gap:6px;justify-content:space-between}
+.nudge{flex:1 1 auto;min-height:42px;padding:0 10px;border-radius:999px;border:1px solid var(--line-l);font-size:14px;color:var(--char);white-space:nowrap;transition:background-color .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),scale .45s var(--settle),opacity .45s var(--settle)}
 .nudge[aria-pressed="true"]{background:var(--char);border-color:var(--char);color:var(--bone)}
-.nudge.go{color:var(--ember-deep);border-color:rgba(168,98,47,.4)}
-.hr{height:1px;background:var(--line-l);margin:4px 0}
-.beats{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.nudge.go{color:var(--ember-deep);border-color:rgba(168,98,47,.38)}
+.pvfoot{gap:14px}
+.pvplay{width:52px;height:52px;border-radius:50%;background:var(--char);color:var(--bone);display:grid;place-items:center;flex:none}
+.pvplay svg{margin-left:3px}
+.pvlbl{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.25}
+.pvlbl b{font-weight:500;font-size:15px}
+.pvlbl>span{font-size:13px;color:var(--mute-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pacebtn{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;margin-right:-6px;border-radius:999px;font-size:14px;color:var(--mute-l);font-variant-numeric:tabular-nums}
+.pacebtn svg{color:var(--ember-deep)}
+/* the pacing sheet */
+.psheet{position:absolute;inset:0;z-index:30}
+.psheet .scrim{position:absolute;inset:0;background:rgba(20,16,12,.34);opacity:0;transition:opacity .5s var(--ease)}
+.psheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:76%;display:flex;flex-direction:column;background:var(--paper);border-radius:24px 24px 0 0;box-shadow:0 -18px 50px rgba(40,28,18,.22);transform:translate3d(0,102%,0);transition:transform .55s var(--settle);padding-bottom:env(safe-area-inset-bottom,0px)}
+.psheet .panel::after{content:"";position:absolute;inset:0;border-radius:inherit;background-image:var(--grain-l);background-size:220px;mix-blend-mode:multiply;opacity:.55;pointer-events:none}
+.psheet.open .scrim{opacity:1}
+.psheet.open .panel{transform:translate3d(0,var(--drag,0px),0)}
+.psheet.dragging .panel{transition:none}
+.psheet .grab{flex:none;height:28px;display:grid;place-items:center;touch-action:none;cursor:grab}
+.psheet .grab i{width:38px;height:5px;border-radius:3px;background:var(--line-l)}
+.phead{flex:none;padding-bottom:12px;touch-action:none}
+.phead .why{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--mute-l)}
+.beats{list-style:none;margin:0;padding-top:0;padding-bottom:18px;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.beats::-webkit-scrollbar{display:none}
 .beats li button{display:grid;grid-template-columns:1fr auto;gap:4px 12px;width:100%;text-align:left;padding:12px 0;border-top:1px solid var(--line-l)}
-.beats li:last-child button{border-bottom:1px solid var(--line-l)}
 .beats .tx{font-family:var(--serif);font-size:16.5px;line-height:1.35;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .beats .sec{font-size:12.5px;color:var(--mute-l);font-variant-numeric:tabular-nums;text-align:right}
 .beats .kind{font-size:12px;color:var(--ember-deep);letter-spacing:.04em}
 .beats .bar2{height:3px;border-radius:2px;background:var(--line-l);align-self:center;overflow:hidden}
 .beats .bar2 i{display:block;height:100%;background:var(--ember);border-radius:2px}
 .beats li.on .tx{color:var(--ember-deep)}
-.pvplay{width:50px;height:50px;border-radius:50%;background:var(--char);color:var(--bone);display:grid;place-items:center;flex:none}
-.pvplay svg{margin-left:3px}
 .foot .score{font-family:var(--serif);font-style:italic;font-weight:300;font-size:24px;white-space:nowrap}
 
 /* deliver */
@@ -171,8 +225,13 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .tog input:checked::after{transform:translateX(20px)}
 .sealwrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:6px}
 .holdbtn{position:relative;width:132px;height:132px;border-radius:50%;display:grid;place-items:center;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.holdbtn .disk{width:112px;height:112px;border-radius:50%;background:var(--char);display:grid;place-items:center;color:var(--ember);transition:transform .25s}
-.holdbtn.holding .disk{transform:scale(.95)}
+.holdbtn{--hp:0}
+.holdbtn .disk{width:112px;height:112px;border-radius:50%;background:var(--char);display:grid;place-items:center;color:var(--ember);
+  transform:scale(calc(1 - var(--hp) * .07));box-shadow:0 0 0 calc(var(--hp) * 10px) rgba(206,139,88,calc(var(--hp) * .14)),0 calc(14px - var(--hp) * 10px) 30px rgba(40,28,18,calc(.28 - var(--hp) * .18))}
+.holdbtn .disk .arc{transition:filter .3s}
+.holdbtn.holding .disk .arc{filter:drop-shadow(0 0 calc(var(--hp) * 8px) rgba(240,181,126,.8))}
+.holdbtn.landed .disk{animation:landed .9s var(--settle)}
+@keyframes landed{0%{transform:scale(.93)}35%{transform:scale(1.045)}100%{transform:scale(1)}}
 .holdbtn .disk .arc{width:42px;height:26px}
 .holdbtn svg.ring{position:absolute;inset:0;transform:rotate(-90deg)}
 .holdbtn svg.ring circle{fill:none;stroke-width:3}
@@ -219,7 +278,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 
 /* cover */
 .cover{display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:56px 30px}
-.cover::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,rgba(206,139,88,.17),transparent 62%);z-index:0}
+.cover::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,rgba(206,139,88,.17),transparent 62%);z-index:0;pointer-events:none}
+.cover>*{position:relative;z-index:1}
 .cover .eyebrow{color:var(--mute-d);font-size:11px}
 .rings{position:relative;width:min(100%,370px);aspect-ratio:1;margin:14px 0 4px;transition:transform 1.6s cubic-bezier(.3,0,.2,1),opacity 1.4s,filter 1.4s}
 .rings svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
@@ -227,59 +287,76 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .rings .rg.rev{animation-direction:reverse}
 @keyframes spin{to{transform:rotate(360deg)}}
 .rings .holdbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:96px;height:96px}
-.rings .holdbtn .disk{width:30px;height:30px;background:#F0B57E;box-shadow:0 0 30px rgba(240,181,126,.55);transition:transform .3s,box-shadow .3s}
-.rings .holdbtn.holding .disk{transform:scale(1.25);box-shadow:0 0 50px rgba(240,181,126,.8)}
+.rings .holdbtn .disk{width:30px;height:30px;background:#F0B57E;transform:scale(calc(1 + var(--hp) * .45));box-shadow:0 0 calc(30px + var(--hp) * 40px) calc(var(--hp) * 6px) rgba(240,181,126,calc(.5 + var(--hp) * .4))}
+.rings .holdbtn:not(.holding):not(.landed) .disk{animation:idle 3.6s ease-in-out infinite}
+@keyframes idle{50%{box-shadow:0 0 42px 2px rgba(240,181,126,.68)}}
+.rings .holdbtn.landed .disk{animation:bloom 1.4s var(--settle) forwards}
+@keyframes bloom{from{transform:scale(1.45)}to{transform:scale(2.2);opacity:.0}}
 .rings .holdbtn .track{stroke:rgba(206,139,88,.25)}
 .cover .for{font-family:var(--serif);font-style:italic;font-weight:300;font-size:60px;line-height:1;margin:6px 0 12px;font-variation-settings:"opsz" 144}
 .cover .meta{font-size:15px;color:var(--mute-d)}
 .cover .hint{margin-top:auto;font-size:15px;color:#cfc6b9}
 .cover .hp{font-size:12.5px;color:var(--mute-d);margin-top:8px}
 .cover.opening .rings{transform:scale(1.9);opacity:0;filter:blur(6px)}
-.cover.opening .for,.cover.opening .meta,.cover.opening .hint,.cover.opening .eyebrow,.cover.opening .hp{opacity:0;transition:opacity .8s}
+.cover.opening .for,.cover.opening .meta,.cover.opening .hint,.cover.opening .eyebrow,.cover.opening .hp,.cover.opening .writebtn,#s-cover.opening .homebar,#s-cover.opening .closex{opacity:0;transition:opacity .8s var(--ease)}
 
 /* playback stage, shared by the full screen and the preview card */
 .stage{position:relative;overflow:hidden;container-type:size;background:var(--sbg);color:var(--sfg);isolation:isolate}
 .stage::before{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 50% 42%,var(--glow),transparent 55%);animation:drift 14s ease-in-out infinite alternate;z-index:0}
 .stage::after{content:"";position:absolute;inset:0;background-image:var(--gr);background-size:220px;opacity:var(--gro);mix-blend-mode:var(--grb);pointer-events:none;z-index:4}
 @keyframes drift{from{transform:translate(-3%,-2%) scale(1)}to{transform:translate(3%,3%) scale(1.08)}}
-.look-vesper{--sbg:#100F0E;--sfg:#EEE7DB;--acc:#D9955F;--glow:rgba(206,139,88,.17);--soft:#A69D90;--gr:var(--grain-d);--gro:.55;--grb:screen;--mos:.13}
-.look-dawn{--sbg:#F2ECE2;--sfg:#1B1917;--acc:#A8622F;--glow:rgba(236,178,120,.33);--soft:#6A635A;--gr:var(--grain-l);--gro:.7;--grb:multiply;--mos:.16}
-.look-hearth{--sbg:#1D130F;--sfg:#F3E5D3;--acc:#EBA266;--glow:rgba(222,128,72,.24);--soft:#B9A38E;--gr:var(--grain-d);--gro:.5;--grb:screen;--mos:.14}
+.look-vesper{--sbg:#100F0E;--sfg:#EEE7DB;--acc:#D9955F;--glow:rgba(206,139,88,.17);--soft:#A69D90;--gr:var(--grain-d);--gro:.55;--grb:screen;--mos:.22}
+.look-dawn{--sbg:#F2ECE2;--sfg:#1B1917;--acc:#A8622F;--glow:rgba(236,178,120,.33);--soft:#6A635A;--gr:var(--grain-l);--gro:.7;--grb:multiply;--mos:.16;--lit:color-mix(in srgb,var(--acc) 80%,#000)}
+.look-hearth{--sbg:#1D130F;--sfg:#F3E5D3;--acc:#EBA266;--glow:rgba(222,128,72,.24);--soft:#B9A38E;--gr:var(--grain-d);--gro:.5;--grb:screen;--mos:.22}
 .stage.warm{--glow:rgba(232,140,70,.32)}
 .stage.quiet{--glow:rgba(206,139,88,.09)}
 .stage.quiet.look-dawn{--glow:rgba(236,178,120,.18)}
-.beat{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:0 9cqw;font-family:var(--serif);font-weight:300}
-.beat.out{animation:bOut 1s ease forwards}
-@keyframes bOut{to{opacity:0;filter:blur(8px)}}
-.w{display:inline-block;opacity:0;animation:wIn 1.2s cubic-bezier(.2,.6,.2,1) both;animation-delay:var(--d,0ms)}
-@keyframes wIn{from{opacity:0;filter:blur(6px);transform:translateY(.14em)}to{opacity:1;filter:blur(0);transform:none}}
+/* Beats are title cards. Each one sits a touch above centre, arrives phrase by phrase out of a soft blur,
+   drifts very slowly toward the viewer while it holds, then dissolves. The next waits for the dark (--lead). */
+.beat{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:0 9cqw 7cqh;font-family:var(--serif);font-weight:300;font-variation-settings:"opsz" 144;
+  animation:push var(--bd,6s) linear both;transform-origin:50% 46%}
+.beat.out{animation:push var(--bd,6s) linear both,bOut .85s var(--ease) forwards}
+@keyframes push{from{scale:1}to{scale:1.035}}
+@keyframes bOut{to{opacity:0;filter:blur(7px)}}
+.w{display:inline-block;opacity:0;animation:wIn 1.5s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes wIn{from{opacity:0;filter:blur(9px);transform:translateY(.06em)}to{opacity:1;filter:blur(0);transform:none}}
 .w.slow{animation-duration:2.6s}
-.w.land{animation:land 1.6s cubic-bezier(.15,.7,.2,1) both;animation-delay:var(--d,0ms)}
-@keyframes land{from{opacity:0;transform:scale(1.1);filter:blur(12px)}to{opacity:1;transform:none;filter:blur(0)}}
+.w.land{animation:land 1.8s cubic-bezier(.12,.7,.2,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes land{from{opacity:0;transform:scale(1.12);filter:blur(14px)}to{opacity:1;transform:none;filter:blur(0)}}
+.w.fall{animation:fall 2.4s cubic-bezier(.3,.1,.2,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+@keyframes fall{from{opacity:0;transform:translateY(-.9em);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
 .paused,.paused *,.paused::before{animation-play-state:paused!important}
 .beat p{margin:0}
-.t-name{font-style:italic;font-size:17cqw;line-height:1;text-align:center;font-variation-settings:"opsz" 144}
-.t-plain{font-size:8.4cqw;line-height:1.2;font-variation-settings:"opsz" 72;text-wrap:pretty;transform:translateY(var(--y,0))}
-.t-lead{font-size:7.4cqw;line-height:1.2;font-variation-settings:"opsz" 72;margin-bottom:1cqw!important}
-.t-weight{font-size:25cqw;line-height:.95;font-weight:640;letter-spacing:-.02em;font-variation-settings:"opsz" 144;margin-left:-1cqw!important}
-.t-drop{position:absolute;left:66%;top:64%;font-style:italic;font-size:4.6cqw;color:var(--sfg)}
-.t-item{font-size:8.2cqw;line-height:1.25;opacity:0;animation:wIn 1.4s cubic-bezier(.2,.6,.2,1) both;animation-delay:var(--d,0ms)}
-.t-item:nth-child(2){padding-left:8cqw}
-.t-item:nth-child(3){padding-left:16cqw}
-.t-item:nth-child(4){padding-left:24cqw}
+/* one scale for every beat: sizes follow the frame's width, capped by its height for wide cards */
+.t-name{font-style:italic;font-size:min(var(--fit,18cqw),9.4cqh);line-height:1;text-align:center;letter-spacing:-.012em}
+.t-plain{font-size:min(9.4cqw,5cqh);line-height:1.13;letter-spacing:-.012em;text-wrap:balance;transform:translateY(var(--y,0))}
+.t-lead{font-style:italic;font-size:min(7cqw,3.8cqh);line-height:1.18;color:var(--soft);margin-bottom:2.5cqw!important;text-wrap:balance}
+.t-weight{font-size:min(var(--fit,26cqw),14cqh);line-height:.92;font-weight:600;letter-spacing:-.03em;margin-left:-.6cqw!important;white-space:nowrap}
+.t-drop{align-self:flex-end;margin:9cqh 1cqw 0 0!important;font-style:italic;font-size:min(6cqw,3.2cqh);color:var(--soft);letter-spacing:.01em}
+.t-item{font-size:min(8.6cqw,4.6cqh);line-height:1.18;letter-spacing:-.01em;opacity:0;animation:wIn 1.6s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--d,0ms))}
+.t-item+.t-item{margin-top:1.2cqh!important}
+.t-item:nth-child(2){padding-left:7cqw}
+.t-item:nth-child(3){padding-left:14cqw}
+.t-item:nth-child(4){padding-left:21cqw}
+.t-item:nth-child(5){padding-left:28cqw}
 .t-item.last{color:var(--acc);font-style:italic}
-.t-whisper{font-style:italic;font-size:7.6cqw;text-align:center;color:var(--soft)}
-.t-close{font-size:10.2cqw;line-height:1.14;text-align:center;font-variation-settings:"opsz" 120;text-wrap:balance}
+.t-whisper{font-style:italic;font-size:min(8cqw,4.3cqh);text-align:center;color:var(--soft);letter-spacing:.005em}
+.t-close{font-size:min(10.4cqw,5.6cqh);line-height:1.1;letter-spacing:-.015em;text-align:center;text-wrap:balance}
 .em-glow{color:var(--acc);font-style:italic;text-shadow:0 0 .35em var(--glow)}
-.st-close .em-glow{animation:wIn 1.6s cubic-bezier(.2,.6,.2,1) both,glowp 4s ease-in-out 1s infinite;animation-delay:var(--d,0ms),calc(var(--d,0ms) + 1.6s)}
+.st-close .em-glow{animation:wIn 2s cubic-bezier(.25,.1,.25,1) both,glowp 4s ease-in-out 1s infinite;animation-delay:calc(var(--lead,0ms) + var(--d,0ms)),calc(var(--lead,0ms) + var(--d,0ms) + 2s)}
 @keyframes glowp{50%{text-shadow:0 0 .6em var(--acc)}}
-.mosaic{position:absolute;left:7cqw;right:7cqw;top:9cqh;bottom:24cqh;overflow:hidden;font:400 2.25cqw/1.62 var(--sans);text-align:justify;color:var(--sfg);animation:fadeIn 1.6s ease both;-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent)}
-.mosaic span{opacity:var(--mos)}
-.mosaic span.lit{animation:lit 1.1s ease both;animation-delay:var(--ld,0ms)}
-@keyframes lit{from{opacity:var(--mos)}to{opacity:1;color:var(--acc)}}
+/* The echo beat, as in the deck: the whole letter set small and dense, nearly filling the frame, and the
+   repeated words lit inside it as huge stretched capitals (I / NOTI / CED). */
+.mosaic{position:absolute;left:7cqw;right:7cqw;top:9.5cqh;bottom:15cqh;overflow:hidden;font:400 1.52cqw/1.24 var(--sans);text-align:justify;color:var(--sfg);
+  animation:fadeIn 1.8s var(--ease) both;animation-delay:var(--lead,0ms);-webkit-mask-image:linear-gradient(180deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(180deg,transparent,#000 3%,#000 97%,transparent)}
+.mosaic .base{opacity:var(--mos)}
+/* The lit copy: the same text in warm bone, seen only through the shape of the words. */
+.mosaic .lit-layer{position:absolute;inset:0;color:var(--lit,color-mix(in srgb,var(--acc) 45%,var(--sfg)));-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  opacity:0;animation:litIn 2.6s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--ld,0ms))}
+@keyframes litIn{from{opacity:0;filter:blur(3px)}to{opacity:.92;filter:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.st-echo{justify-content:flex-end;padding-bottom:9cqh}
-.t-echo{font-style:italic;font-size:7.2cqw;line-height:1.2;text-align:center;text-wrap:balance}
+.st-echo{justify-content:flex-end;padding-bottom:7.5cqh}
+.t-echo{font-style:italic;font-size:min(5.4cqw,2.9cqh);line-height:1.16;text-align:center;text-wrap:balance}
 .stage .mark{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:var(--acc)}
 
 /* play screen */
@@ -292,7 +369,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .pbar{position:absolute;left:max(24px,env(safe-area-inset-left,0px));right:max(24px,env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));height:2px;background:rgba(150,140,128,.25);z-index:10;border-radius:2px;overflow:hidden}
 .pbar i{display:block;height:100%;width:0;background:var(--acc,#CE8B58);opacity:.8}
 .pnote{position:absolute;left:0;right:0;bottom:calc(40px + env(safe-area-inset-bottom,0px));text-align:center;z-index:10;font-size:13px;color:var(--soft,#A69D90);transition:opacity .5s;pointer-events:none}
-.soundchip{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:12;background:rgba(238,231,219,.12);border:1px solid rgba(238,231,219,.25);color:#EEE7DB;border-radius:999px;padding:9px 16px;font-size:13px;backdrop-filter:blur(8px)}
+.soundchip{position:absolute;left:50%;top:14px;translate:-50% 0;z-index:12;background:rgba(238,231,219,.12);border:1px solid rgba(238,231,219,.25);color:#EEE7DB;border-radius:999px;padding:9px 16px;font-size:13px;backdrop-filter:blur(8px)}
 
 /* end */
 .end{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding-block:40px}
@@ -306,16 +383,24 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .end .back{margin-top:26px;font-size:14px;color:var(--mute-d);padding:10px}
 
 /* poster sheet */
-.sheet{position:absolute;inset:0;z-index:40;background:rgba(10,9,8,.78);backdrop-filter:blur(10px);display:flex;flex-direction:column;animation:scrIn .4s both}
+.sheet{position:absolute;inset:0;z-index:40;background:rgba(10,9,8,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;flex-direction:column;animation:fadeIn .6s var(--ease) both}
+.sheet .in>*{animation:rise .9s var(--settle) .15s backwards}
+.sheet.bye{animation:fadeAway .45s var(--ease) forwards;pointer-events:none}
 .sheet .in{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:18px;padding-block:58px 30px;color:var(--bone)}
 .sheet img{width:min(100%,330px);border-radius:3px;box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);-webkit-touch-callout:default}
 .sheet .cap{font-size:13.5px;color:var(--mute-d);text-align:center;line-height:1.5;max-width:300px}
 .sheet .btn-ink{background:var(--bone);color:var(--char);max-width:300px}
-.toast{position:absolute;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--char);color:var(--bone);border-radius:999px;padding:11px 18px;font-size:14px;white-space:nowrap;animation:scrIn .3s both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast{position:absolute;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:60;background:var(--char);color:var(--bone);border-radius:999px;padding:11px 18px;font-size:14px;white-space:nowrap;animation:fadeUp .5s var(--settle) both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.bye{animation:fadeAway .5s var(--ease) forwards}
 
 @media (prefers-reduced-motion:reduce){
-  .w,.w.land,.t-item,.mosaic span.lit{animation-duration:1.2s!important;transform:none!important;filter:none!important}
+  .w,.w.land,.w.fall,.t-item,.mosaic .lit-layer{animation-duration:1.2s!important;transform:none!important;filter:none!important}
+  .beat,.beat.out{scale:none!important}
+  @keyframes fall{from{opacity:0}to{opacity:1}}
   .rings .rg,.stage::before{animation:none}
+  .scr.entering,.scr.leaving{animation-duration:.25s!important;animation-delay:0s!important}
+  .scr.entering .stagger>*{animation:none!important}
+  @keyframes scrIn{from{opacity:0}} @keyframes scrInBack{from{opacity:0}} @keyframes scrOut{to{opacity:0}} @keyframes scrOutBack{to{opacity:0}}
   @keyframes wIn{from{opacity:0}to{opacity:1}}
   @keyframes land{from{opacity:0}to{opacity:1}}
 }
@@ -338,7 +423,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
   <!-- WRITE -->
   <section class="scr paper" id="s-write" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="home">Cancel</button><span class="t">New Kept</span><button class="r" type="button" id="b-compose" disabled>Compose</button></nav>
-    <div class="write-body gut scroll">
+    <div class="write-body gut scroll stagger">
       <label class="field"><span>To</span><input id="in-to" type="text" autocomplete="off" maxlength="40" placeholder="Their name"></label>
       <label class="field small"><span>From</span><input id="in-from" type="text" autocomplete="off" maxlength="40" placeholder="Your name"></label>
       <textarea id="in-text" maxlength="1400" placeholder="Say the thing you'd want them to keep."></textarea>
@@ -351,34 +436,35 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
     </div>
   </section>
 
-  <!-- PREVIEW -->
+  <!-- PREVIEW: the composed piece is the hero; the pacing lives in a sheet -->
   <section class="scr paper" id="s-preview" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="write">Back</button><span class="t">Preview</span><button class="r" type="button" id="b-next">Next</button></nav>
-    <div class="scroll gut">
-      <div class="pv">
-        <h2 class="ital">Composed for you.</h2>
-        <div class="card" id="pv-card">
-          <div class="stage look-vesper" id="pv-stage"></div>
-          <div class="meta"><b id="pv-look">Vesper</b><span id="pv-desc"></span></div>
-          <div class="composing" id="pv-composing" hidden><span class="arc" data-arc></span><div class="line" id="pv-cline">Reading what you wrote</div></div>
-        </div>
-        <p class="muted" id="pv-why"></p>
-        <div class="hr"></div>
-        <h3 class="ital" style="font-size:24px;margin:0">Not quite it?</h3>
-        <div class="nudges">
-          <button class="nudge" type="button" data-nudge="warm" aria-pressed="false">Warmer</button>
-          <button class="nudge" type="button" data-nudge="quiet" aria-pressed="false">Quieter</button>
-          <button class="nudge" type="button" data-nudge="simple" aria-pressed="false">Simpler</button>
-          <button class="nudge go" type="button" data-nudge="another">Try another</button>
-        </div>
-        <p class="eyebrow" style="margin-top:8px" id="pv-total">The pacing</p>
-        <ol class="beats" id="pv-beats"></ol>
+    <div class="pv gut stagger">
+      <div class="card" id="pv-card">
+        <div class="stage look-vesper" id="pv-stage"></div>
+        <div class="ticks" id="pv-ticks" aria-hidden="true"></div>
+        <div class="meta"><b id="pv-look">Vesper</b><span id="pv-desc"></span></div>
+        <div class="composing" id="pv-composing" hidden><span class="arc" data-arc></span><div class="line" id="pv-cline">Reading what you wrote</div></div>
+      </div>
+      <div class="nudges" role="group" aria-label="Adjust the composition">
+        <button class="nudge" type="button" data-nudge="warm" aria-pressed="false">Warmer</button>
+        <button class="nudge" type="button" data-nudge="quiet" aria-pressed="false">Quieter</button>
+        <button class="nudge" type="button" data-nudge="simple" aria-pressed="false">Simpler</button>
+        <button class="nudge go" type="button" data-nudge="another">Try another</button>
       </div>
     </div>
-    <div class="foot gut">
+    <div class="foot gut pvfoot">
       <button class="pvplay" id="b-pvplay" type="button" aria-label="Watch it with sound"><svg width="16" height="18" viewBox="0 0 16 18" aria-hidden="true"><path d="M1 1.5v15l13.5-7.5z" fill="currentColor"/></svg></button>
-      <span class="score" id="pv-score">Low Tide</span>
-      <span class="lbl">watch it the way <span id="pv-to">they</span> will</span>
+      <span class="pvlbl"><b>Watch it with sound</b><span>the way <span id="pv-to">they</span> will</span></span>
+      <button class="pacebtn" id="b-pacing" type="button" aria-haspopup="dialog"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2h9M1 7h14M1 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span id="pv-secs">Pacing</span></button>
+    </div>
+    <div class="psheet" id="pace-sheet" hidden>
+      <div class="scrim"></div>
+      <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pv-total">
+        <div class="grab" aria-hidden="true"><i></i></div>
+        <div class="phead gut"><p class="eyebrow" id="pv-total">The pacing</p><p class="why" id="pv-why"></p></div>
+        <ol class="beats gut" id="pv-beats"></ol>
+      </div>
     </div>
   </section>
 
@@ -386,7 +472,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
   <section class="scr paper" id="s-deliver" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="preview">Back</button><span class="t">Deliver</span><span></span></nav>
     <div class="scroll gut">
-      <div class="dv">
+      <div class="dv stagger">
         <h2 class="ital" id="dv-q">When should they open it?</h2>
         <div class="chips" role="group" aria-label="When it opens">
           <button class="chip" type="button" data-when="now" aria-pressed="true">Now</button>
@@ -395,8 +481,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
         </div>
         <p class="when" id="dv-when">Now</p>
         <div class="toggles">
-          <label class="tog">Suggest headphones<input type="checkbox" id="tg-hp" checked></label>
-          <label class="tog"><span id="tg-r-lbl">Let them reply in kind</span><input type="checkbox" id="tg-reply" checked></label>
+          <label class="tog">Suggest headphones<input type="checkbox" switch id="tg-hp" checked></label>
+          <label class="tog"><span id="tg-r-lbl">Let them reply in kind</span><input type="checkbox" switch id="tg-reply" checked></label>
         </div>
         <div class="sealwrap">
           <button class="holdbtn" id="b-seal" type="button" aria-label="Hold to seal">
@@ -411,8 +497,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 
   <!-- SEALED -->
   <section class="scr paper" id="s-sealed" hidden>
-    <div class="sealed gut scroll">
-      <span class="mark" data-arc></span>
+    <div class="sealed gut scroll stagger">
+      <span class="mark own" data-arc></span>
       <h2>Sealed for <i id="sd-to">Jonah</i>.</h2>
       <p class="muted" id="sd-sub">Send them this link. It carries the whole letter, and it opens in Kept on their phone.</p>
       <div class="linkbox">
@@ -472,7 +558,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 
   <!-- END -->
   <section class="scr dark" id="s-end" hidden>
-    <div class="end gut">
+    <div class="end gut stagger">
       <span class="arc" data-arc></span>
       <div class="who" id="en-who"></div>
       <div class="acts" id="en-acts"></div>
@@ -496,6 +582,22 @@ const store = {
 const cap = n => { try { return (window.claude && window.claude.use) ? window.claude.use(n).catch(() => null) : Promise.resolve(null); } catch (e) { return Promise.resolve(null); } };
 const CAP = { sample: cap('sample'), downloads: cap('downloads'), dictation: cap('dictation') };
 const ARC = '<svg viewBox="0 0 40 24" aria-hidden="true"><path d="M5 21.5A15 15 0 0 1 35 21.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="20" cy="17.5" r="3.4" fill="currentColor"/></svg>';
+/* Haptics. Android takes navigator.vibrate. iOS Safari has no vibrate, but toggling a native switch
+   (input[switch], iOS 18+) plays the system tick, so a hidden one stands in. Elsewhere this is silent. */
+const haptic = (() => {
+  let lab = null, last = 0;
+  const tickIOS = () => {
+    if (!lab) { lab = document.createElement('label'); lab.setAttribute('aria-hidden', 'true'); lab.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1; lab.appendChild(i); document.body.appendChild(lab); }
+    lab.click();
+  };
+  const PAT = { soft: 6, light: 10, medium: 16, heavy: [18, 60, 26] };
+  return kind => {
+    const now = performance.now(); if (now - last < 40) return; last = now;
+    try { if (navigator.vibrate && navigator.vibrate(PAT[kind] || 10)) return; } catch (e) {}
+    try { tickIOS(); if (kind === 'heavy') setTimeout(tickIOS, 90); } catch (e) {}
+  };
+})();
 const fillArcs = (root = document) => root.querySelectorAll('[data-arc]').forEach(e => { if (!e.firstChild) e.innerHTML = ARC; });
 fillArcs();
 
@@ -503,6 +605,36 @@ function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79
 const wc = t => (t.trim().match(/\S+/g) || []).length;
 const normText = t => String(t || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
 const cleanName = t => normText(t).replace(/[^\p{L}\p{N} .'-]/gu, '').slice(0, 40);
+
+/* ---------- touch ---------- */
+// Everything you can tap gives a little under the finger. The class stays long enough to be seen on a quick tap.
+const TAPPABLE = 'button:not(.holdbtn), .rowitem, label.tog';
+document.addEventListener('pointerdown', e => {
+  const t = e.target.closest(TAPPABLE); if (!t || t.disabled) return;
+  if (!t.classList.contains('tap')) { t.classList.add('tap'); void t.offsetWidth; } t.classList.add('pressed'); t._pt = performance.now();
+  const up = () => { const wait = Math.max(0, 110 - (performance.now() - t._pt)); setTimeout(() => t.classList.remove('pressed'), wait); window.removeEventListener('pointerup', up, true); window.removeEventListener('pointercancel', up, true); };
+  window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);
+}, true);
+document.addEventListener('touchstart', () => {}, { passive: true });
+// The page never scrolls or zooms under a finger. Only a list that really has more to show can move.
+const canScroll = (el, dy) => {
+  for (; el && el !== document.body; el = el.parentElement) {
+    if (el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) {
+      if (dy > 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+      return el.tagName === 'TEXTAREA';
+    }
+  }
+  return false;
+};
+let touchY = 0;
+document.addEventListener('touchstart', e => { if (e.touches.length === 1) touchY = e.touches[0].clientY; }, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) { e.preventDefault(); return; }
+  const dy = e.touches[0].clientY - touchY;
+  if (!canScroll(e.target, dy)) e.preventDefault();
+}, { passive: false });
+['gesturestart', 'gesturechange', 'dblclick'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input,textarea')) e.preventDefault(); });
 
 /* ---------- paper grain, made in the page ---------- */
 function grain(dark) {
@@ -522,6 +654,7 @@ function grain(dark) {
   return c.toDataURL('image/png');
 }
 const GRAIN_L = grain(false), GRAIN_D = grain(true);
+try { document.fonts.load("800 100px Inter"); } catch (e) {}
 document.documentElement.style.setProperty('--grain-l', `url(${GRAIN_L})`);
 document.documentElement.style.setProperty('--grain-d', `url(${GRAIN_D})`);
 
@@ -669,13 +802,15 @@ const splitEm = (t, em) => {
   if (i < 0) { const m = t.match(/^(.*?)(\S+)$/); return m ? [m[1].trim(), m[2]] : ['', t]; }
   return [t.slice(0, i).trim(), t.slice(i).trim()];
 };
-const ITEM_D = (k, n, D) => 400 + k * Math.max(900, (D - 2200) / n);
-const FRAC = { weight: .42, drop: .56, close: .34 };
+const ITEM_D = (k, n, D) => 300 + k * Math.max(900, (D - 2400) / n);
+const FRAC = { weight: .36, drop: .5, close: .34 };
+// The dark between two beats: the last one dissolves, a breath of nothing, then the next arrives.
+const LEAD = 520;
 
 function effBeats(L) {
   const c = L.c, text = L.x;
   const tempo = (c.tempo || 1) * (c.quiet ? 1.12 : 1) * (c.warm ? 1.1 : 1);
-  return c.beats.map(b => {
+  return c.beats.map((b, i) => {
     let st = b.st; const t = text.slice(b.s, b.e);
     if (c.simple && ['weight', 'drop', 'list', 'echo'].includes(st)) st = 'plain';
     const n = wc(t); let d;
@@ -689,7 +824,8 @@ function effBeats(L) {
       case 'drop': d = 3000 + 380 * n; break;
       default: d = 1900 + 360 * n;
     }
-    return { text: t, st, em: b.em, dur: Math.round(d * tempo) };
+    const lead = i ? LEAD : 0;
+    return { text: t, st, em: b.em, lead, dur: Math.round(d * tempo) + lead };
   });
 }
 const totalSec = L => Math.round(effBeats(L).reduce((a, b) => a + b.dur, 0) / 1000);
@@ -844,7 +980,7 @@ function strings(S, notes, t, dur, lvl, pad) {
   if (dur < 999) lfo.stop(t + dur + 6);
 }
 function beatMusic(S, b, i) {
-  const ctx = S.ctx, sc = S.sc, t = ctx.currentTime + .06, v = S.q ? .55 : .85, D = b.dur / 1000;
+  const ctx = S.ctx, sc = S.sc, t = ctx.currentTime + .06 + (b.lead || 0) / 1000, v = S.q ? .55 : .85, D = (b.dur - (b.lead || 0)) / 1000;
   const ch = sc.chords[S.ci++ % sc.chords.length];
   const arp = (notes, t0, vel, k) => notes.slice(0, k).forEach((m, j) => piano(S, m, t0 + j * .17 + Math.random() * .03, vel * (1 - j * .12)));
   switch (b.st) {
@@ -852,7 +988,7 @@ function beatMusic(S, b, i) {
     case 'plain': arp(ch, t, .7 * v, S.q ? 1 : 3); if (!S.q && D > 4.5) piano(S, sc.mel[(i * 2) % sc.mel.length], t + D * .55, .28 * v); break;
     case 'weight': arp(ch.slice(1), t, .45 * v, 2); piano(S, ch[0] - 12, t + D * FRAC.weight, 1 * v); piano(S, ch[0], t + D * FRAC.weight + .02, .6 * v); if (S.w) strings(S, ch, t + D * FRAC.weight, D * .5, .5); break;
     case 'drop': arp(ch, t, .5 * v, 2); piano(S, sc.mel[sc.mel.length - 1] + 12, t + D * FRAC.drop, .2 * v); break;
-    case 'list': { const n = b.text.split(/,\s*/).length; piano(S, ch[0] - 12, t, .5 * v); for (let k = 0; k < n; k++) piano(S, sc.mel[k % sc.mel.length], t + ITEM_D(k, n, b.dur) / 1000, .45 * v); break; }
+    case 'list': { const n = b.text.split(/,\s*/).length; piano(S, ch[0] - 12, t, .5 * v); for (let k = 0; k < n; k++) piano(S, sc.mel[k % sc.mel.length], t + ITEM_D(k, n, D * 1000) / 1000, .45 * v); break; }
     case 'echo': if (!S.q) strings(S, ch, t, D * .8, .6); piano(S, sc.mel[1], t + .3, .4 * v); piano(S, sc.mel[1], t + D * .42, .32 * v); piano(S, sc.mel[3], t + D * .7, .28 * v); break;
     case 'whisper': piano(S, sc.mel[3], t + .5, .26 * v); break;
     case 'close': strings(S, sc.resolve, t + .1, D + 1.5, S.q ? .35 : .7); sc.resolve.forEach((m, j) => piano(S, m, t + .25 + j * .22, .6 * v)); piano(S, sc.mel[0] + 12, t + D * FRAC.close + .4, .35 * v); piano(S, sc.resolve[0] - 12, t + D * .8, .5 * v); break;
@@ -860,24 +996,30 @@ function beatMusic(S, b, i) {
 }
 
 /* ---------- beat rendering ---------- */
+// Words arrive in phrases, the way they'd be said: close together inside a phrase, a breath at each comma.
 function wordsHTML(text, d0, span, cls = '') {
-  const ws = text.split(' ').filter(Boolean), step = ws.length > 1 ? span / (ws.length - 1) : 0;
-  return ws.map((w, i) => `<span class="w ${cls}" style="--d:${Math.round(d0 + i * step)}ms">${esc(w)}</span>`).join(' ');
+  const ws = text.split(' ').filter(Boolean), at = []; let t = 0;
+  ws.forEach((w, i) => { at.push(t); t += /[,;:\u2014-]$/.test(w) ? 420 : 150; });
+  const last = at[at.length - 1] || 0, k = last > span ? span / last : 1;
+  return ws.map((w, i) => `<span class="w ${cls}" style="--d:${Math.round(d0 + at[i] * k)}ms">${esc(w)}</span>`).join(' ');
 }
+// Big single words are sized to the frame, so a long one never breaks or spills.
+const fitCqw = (word, max, per) => Math.min(max, per / Math.max(1, word.length)).toFixed(2) + 'cqw';
 function renderBeat(stage, b, L, idx) {
   const el = document.createElement('div'); el.className = 'beat st-' + b.st;
-  const D = b.dur, r = rng((L.c.seed || 1) + idx * 97);
+  const lead = stage.querySelector('.beat:not(.out)') ? (b.lead || 0) : 0, D = b.dur - (b.lead || 0), r = rng((L.c.seed || 1) + idx * 97);
+  el.style.setProperty('--lead', lead + 'ms'); el.style.setProperty('--bd', (b.dur + 1200) + 'ms');
   switch (b.st) {
-    case 'name': el.innerHTML = `<p class="t-name"><span class="w slow" style="--d:250ms">${esc(b.text)}</span></p>`; break;
+    case 'name': el.innerHTML = `<p class="t-name" style="--fit:${fitCqw(b.text, 18, 180)}"><span class="w slow" style="--d:250ms">${esc(b.text)}</span></p>`; break;
     case 'plain': {
       const n = wc(b.text);
-      el.innerHTML = `<p class="t-plain">${wordsHTML(b.text, 200, Math.min(D * .45, 260 * n))}</p>`;
-      el.style.setProperty('--y', Math.round((r() - .5) * 18) + 'cqh');
-      if (r() < .3 && n <= 8) el.querySelector('p').style.paddingLeft = '10cqw';
+      el.innerHTML = `<p class="t-plain">${wordsHTML(b.text, 200, Math.min(D * .42, 240 * n))}</p>`;
+      el.style.setProperty('--y', Math.round((r() - .5) * 12) + 'cqh');
+      if (r() < .3 && n <= 8) el.querySelector('p').style.paddingLeft = '8cqw';
       break;
     }
-    case 'weight': { const [lead, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-lead">${wordsHTML(lead, 200, D * .22)}</p><p class="t-weight"><span class="w land" style="--d:${Math.round(D * FRAC.weight)}ms">${esc(em)}</span></p>`; break; }
-    case 'drop': { const [lead, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-plain" style="--y:-6cqh">${wordsHTML(lead, 200, D * .3)}</p><span class="t-drop w slow" style="--d:${Math.round(D * FRAC.drop)}ms">${esc(em)}</span>`; break; }
+    case 'weight': { const [pre, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-lead">${wordsHTML(pre, 200, D * .2)}</p><p class="t-weight" style="--fit:${fitCqw(em, 26, 150)}"><span class="w land" style="--d:${Math.round(D * FRAC.weight)}ms">${esc(em)}</span></p>`; break; }
+    case 'drop': { const [pre, em] = splitEm(b.text, b.em); el.innerHTML = `<p class="t-plain">${wordsHTML(pre, 200, D * .28)}</p><p class="t-drop"><span class="w fall" style="--d:${Math.round(D * FRAC.drop)}ms">${esc(em)}</span></p>`; break; }
     case 'list': { const it = b.text.split(/,\s*/); el.innerHTML = it.map((s, k) => `<p class="t-item${k === it.length - 1 ? ' last' : ''}" style="--d:${Math.round(ITEM_D(k, it.length, D))}ms">${esc(s)}${k < it.length - 1 ? ',' : ''}</p>`).join(''); break; }
     case 'whisper': el.innerHTML = `<p class="t-whisper"><span class="w slow" style="--d:450ms">${esc(b.text)}</span></p>`; break;
     case 'close': {
@@ -886,30 +1028,57 @@ function renderBeat(stage, b, L, idx) {
       break;
     }
     case 'echo': {
-      const words = (L.x.match(/\S+/g) || []);
-      const sw = stage.clientWidth || 360, sh = stage.clientHeight || 640;
-      const need = Math.min(1400, Math.ceil((sw * sh) / Math.pow(sw * .0225, 2) / 5.2));
-      let html = ''; for (let k = 0; k < need; k++) html += '<span>' + esc(words[k % words.length]) + '</span> ';
-      el.innerHTML = `<div class="mosaic">${html}</div><p class="t-echo">${wordsHTML(b.text, 900, D * .3)}</p>`;
+      // Repeat the letter until it overfills the box: about 0.52em per character at 1.52cqw on 1.24 leading.
+      const sw = stage.clientWidth || 360, sh = stage.clientHeight || 640, fs = sw * .0152;
+      const chars = Math.ceil((sw * .86 / (fs * .5)) * (sh * .76 / (fs * 1.24)) * 1.15), one = L.x + ' ';
+      const txt = esc(one.repeat(Math.max(1, Math.ceil(chars / one.length))));
+      el.innerHTML = `<div class="mosaic"><div class="base">${txt}</div></div><p class="t-echo">${wordsHTML(b.text, 900, D * .3)}</p>`;
+      
       break;
     }
   }
   stage.querySelectorAll('.beat:not(.out)').forEach(o => { o.classList.add('out'); setTimeout(() => o.remove(), 1100); });
   stage.appendChild(el);
-  if (b.st === 'echo') requestAnimationFrame(() => lightMosaic(stage, el, D));
+  if (b.st === 'echo') requestAnimationFrame(() => litMosaic(el, echoWords(b.text), D));
 }
-function lightMosaic(stage, el, D) {
-  const mo = el.querySelector('.mosaic'); if (!mo) return;
-  const sr = stage.getBoundingClientRect(), W = sr.width, H = sr.height;
-  const cx = W / 2, cy = H * .44, R = W * .3, th = W * .095, dotR = W * .065, dy = cy - R * .2;
-  mo.querySelectorAll('span').forEach(s => {
-    const q = s.getBoundingClientRect(); const x = q.left - sr.left + q.width / 2, y = q.top - sr.top + q.height / 2;
-    const dx = x - cx, dyy = y - cy, dist = Math.hypot(dx, dyy);
-    let delay = -1;
-    if (Math.abs(dist - R) < th / 2 && y <= cy + th * .25) { const ang = Math.atan2(-dyy, dx); delay = (1 - Math.max(0, Math.min(Math.PI, ang)) / Math.PI) * D * .45 + 800; }
-    else if (Math.hypot(x - cx, y - dy) < dotR) delay = D * .5 + 900;
-    if (delay >= 0) { s.style.setProperty('--ld', Math.round(delay) + 'ms'); s.classList.add('lit'); }
+// The words the echo turns on: what the repeated lines share ("I noticed. I noticed all of it." -> "I NOTICED"),
+// otherwise the first line, kept to a couple of words so the letters can be huge.
+function echoWords(text) {
+  const parts = text.split(/(?<=[.!?])\s+/).map(p => (p.toLowerCase().match(/[a-z0-9']+/g) || []));
+  let w = parts[0] || [];
+  if (parts.length > 1) { const k = w.findIndex((x, i) => x !== parts[1][i]); if (k !== 0) w = k < 0 ? w : w.slice(0, k); }
+  w = w.slice(0, 2); while (w.length > 1 && w.join('').length > 12) w = w.slice(0, -1);
+  return w.join(' ').toUpperCase();
+}
+// Set the words as heavy capitals, a few letters to a row (NOTICED -> NOTI / CED), each row stretched
+// to the full width and all rows together filling the height, like the deck. A lone letter keeps its width.
+function litMosaic(el, phrase, D) {
+  const mo = el.querySelector('.mosaic'); if (!mo || !phrase) return;
+  const W = mo.clientWidth, H = mo.clientHeight; if (!W || !H) return;
+  const words = phrase.split(' '), longest = Math.max(...words.map(w => w.length));
+  let n = longest <= 5 ? 5 : 4, lines;
+  const wrap = n => { const out = []; words.forEach(w => { const k = Math.ceil(w.length / n), m = Math.ceil(w.length / k); const bits = w.match(new RegExp(`.{1,${m}}`, 'g')); bits.forEach(b => { const l = out[out.length - 1]; if (l != null && k === 1 && l.length + 1 + b.length <= n) out[out.length - 1] = l + ' ' + b; else out.push(b); }); }); return out; };
+  while ((lines = wrap(n)).length > 4) n++;
+  const dpr = Math.min(2, window.devicePixelRatio || 1), c = document.createElement('canvas');
+  c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); const x = c.getContext('2d'); x.scale(dpr, dpr);
+  const S = 100; x.font = `800 ${S}px Inter, 'Helvetica Neue', Arial, sans-serif`; x.textBaseline = 'alphabetic'; x.fillStyle = x.strokeStyle = '#fff';
+  const pad = H * .015, gapY = H * .035, rowH = (H - pad * 2 - gapY * (lines.length - 1)) / lines.length, cap = S * .727, sy = rowH / cap;
+  const gapX = W * .03, rows = lines.map(l => { const ch = [...l.replace(/ /g, '')]; const ws = ch.map(k => x.measureText(k).width); return { ch, ws, sum: ws.reduce((a, b) => a + b, 0) }; });
+  const fit = r => (W * .985 - gapX * (r.ch.length - 1)) / r.sum, multi = rows.filter(r => r.ch.length > 1);
+  const sxOne = multi.length ? Math.min(...multi.map(fit)) : Math.min(fit(rows[0]), sy * .9);
+  rows.forEach((r, i) => {
+    const sx = r.ch.length > 1 ? fit(r) : sxOne, total = r.sum * sx + gapX * (r.ch.length - 1);
+    let cx = (W - total) / 2; const base = pad + i * (rowH + gapY) + rowH;
+    r.ch.forEach((k, j) => {
+      x.save(); x.translate(cx, base); x.scale(sx, sy); x.lineWidth = S * .05; x.lineJoin = 'round';
+      x.fillText(k, 0, 0); x.strokeText(k, 0, 0); x.restore();
+      cx += r.ws[j] * sx + gapX;
+    });
   });
+  const lit = document.createElement('div'); lit.className = 'lit-layer'; lit.setAttribute('aria-hidden', 'true');
+  lit.textContent = mo.querySelector('.base').textContent; const url = `url(${c.toDataURL()})`;
+  lit.style.webkitMaskImage = url; lit.style.maskImage = url; lit.style.setProperty('--ld', Math.round(Math.max(900, D * .22)) + 'ms');
+  mo.appendChild(lit);
 }
 function setStageLook(stage, c) { stage.className = 'stage look-' + c.look + (c.warm ? ' warm' : '') + (c.quiet ? ' quiet' : ''); }
 
@@ -935,16 +1104,41 @@ function ringsSVG(svg, phrases, bright) {
 /* ---------- screens ---------- */
 const GROUND = { shelf: '#F3EEE6', write: '#F3EEE6', preview: '#F3EEE6', deliver: '#F3EEE6', sealed: '#F3EEE6', arrive: '#1B2233', cover: '#13110F', play: '#100F0E', end: '#13110F' };
 let current = '';
-function show(id) {
-  if (current === 'preview' && id !== 'preview') stopCardLoop();
-  $$('#app > .scr').forEach(s => { s.hidden = s.id !== 's-' + id; });
+// Rough order of the flow, so going back drifts the other way.
+const ORDER = { cover: 0, shelf: 1, write: 2, preview: 3, deliver: 4, sealed: 5, arrive: 6, play: 7, end: 8 };
+const DARK = new Set(['arrive', 'cover', 'play', 'end']);
+const leaveT = {};
+function show(id, opt = {}) {
+  if (current === 'preview' && id !== 'preview') { stopCardLoop(); closePacing(); }
+  const nx = $('#s-' + id), pv = current && current !== id ? $('#s-' + current) : null, was = current;
   current = id;
+  if (pv) {
+    const back = opt.back != null ? opt.back : ORDER[id] < ORDER[was];
+    const tone = DARK.has(id) !== DARK.has(was), into = id === 'play';
+    // A change of light is slower and sequential; a page turn on paper is a quick crossfade.
+    const to = into ? .7 : tone ? .5 : .38, tdl = into ? .55 : tone ? .26 : .06, td = into ? 1.3 : tone ? .9 : .62;
+    pv.dataset.dir = nx.dataset.dir = back ? 'back' : 'fwd';
+    pv.style.setProperty('--to', to + 's'); nx.style.setProperty('--tdl', tdl + 's'); nx.style.setProperty('--td', td + 's');
+    pv.classList.remove('entering'); pv.classList.add('leaving');
+    clearTimeout(leaveT[pv.id]); leaveT[pv.id] = setTimeout(() => { pv.hidden = true; pv.classList.remove('leaving'); }, to * 1000 + 40);
+    nx.classList.remove('leaving', 'entering'); clearTimeout(leaveT[nx.id]); nx.hidden = false; void nx.offsetWidth; nx.classList.add('entering');
+    clearTimeout(leaveT[nx.id + 'e']); leaveT[nx.id + 'e'] = setTimeout(() => nx.classList.remove('entering'), (tdl + td) * 1000 + 900);
+    $$('#app > .scr').forEach(s => { if (s !== nx && s !== pv) { s.hidden = true; s.classList.remove('entering', 'leaving'); } });
+  } else if (!was) {
+    $$('#app > .scr').forEach(s => { s.hidden = s !== nx; });
+    nx.style.setProperty('--tdl', '.1s'); nx.style.setProperty('--td', '1.4s'); nx.classList.add('entering');
+  }
   document.documentElement.style.setProperty('--ground', id === 'play' && PB.L ? getComputedStyle($('#pl-stage')).getPropertyValue('--sbg') || GROUND.play : GROUND[id]);
   if (id === 'shelf') renderHome();
   const s = $('#s-' + id); const sc = s && s.querySelector('.scroll'); if (sc && id !== 'write') sc.scrollTop = 0;
 }
 document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (!g) return; if (g.dataset.go === 'home') { stopPlayback(true); clearInterval(coverTimer); goHome(); } else show(g.dataset.go); });
-function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; $('#app').appendChild(t); setTimeout(() => t.remove(), 2400); }
+function toast(msg) {
+  $$('.toast').forEach(o => o.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; $('#app').appendChild(t);
+  setTimeout(() => dismiss(t, 520), 2300);
+}
+const dismiss = (el, ms = 460) => { el.classList.add('bye'); setTimeout(() => el.remove(), ms); };
 const fmtWhen = ts => { const d = new Date(ts); return d.toLocaleDateString(undefined, { weekday: 'long' }) + ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
 const fmtDay = ts => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
@@ -978,7 +1172,7 @@ async function copyText(t, after) {
   let ok = false;
   try { await navigator.clipboard.writeText(t); ok = true; } catch (e) {}
   if (!ok) { const i = $('#sd-link'); if (current === 'sealed' && i) { i.focus(); i.select(); } }
-  toast(ok ? 'Link copied' : 'Select the link and copy it');
+  if (ok) haptic('light'); toast(ok ? 'Link copied' : 'Select the link and copy it');
   if (after) after(ok);
 }
 
@@ -1023,48 +1217,81 @@ $('#b-compose').addEventListener('click', async () => {
   store.set('me', from);
   D.L = { f: from, t: to, x: text, at: Date.now(), o: 0, h: true, r: true, c: composeRules(text, to) };
   show('preview'); $('#pv-to').textContent = to;
-  const cmp = $('#pv-composing'); cmp.hidden = false; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = '';
+  const cmp = $('#pv-composing'); cmp.hidden = false; cmp.classList.remove('gone'); $('#pv-stage').innerHTML = ''; $('#pv-ticks').innerHTML = ''; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = ''; $('#pv-secs').textContent = 'Pacing';
   $$('.nudge[aria-pressed]').forEach(b => b.setAttribute('aria-pressed', 'false'));
   let k = 0; $('#pv-cline').textContent = CLINES[0];
-  const iv = setInterval(() => { k = (k + 1) % CLINES.length; $('#pv-cline').textContent = CLINES[k]; }, 1500);
+  const cl = $('#pv-cline'); cl.classList.remove('swap');
+  const iv = setInterval(() => { k = (k + 1) % CLINES.length; cl.classList.add('swap'); setTimeout(() => { cl.textContent = CLINES[k]; cl.classList.remove('swap'); }, 460); }, 1700);
   const started = Date.now();
   const ai = await composeAI(text, to, from);
   const wait = Math.max(0, 2600 - (Date.now() - started)); await new Promise(r => setTimeout(r, wait));
   clearInterval(iv);
   if (current !== 'preview') return;
   if (ai) D.L.c = ai;
-  cmp.hidden = true; renderPreview(true);
+  cmp.classList.add('gone'); renderPreview(true);
 });
 function renderPreview(fresh) {
   const L = D.L, c = L.c, bs = effBeats(L), total = bs.reduce((a, b) => a + b.dur, 0);
   const lk = LOOK[c.look], sc = SCORE[c.look];
-  $('#pv-look').textContent = lk.name; $('#pv-desc').textContent = `${lk.desc} · score: ${sc.name}`; $('#pv-score').textContent = sc.name;
+  $('#pv-look').textContent = lk.name; $('#pv-desc').textContent = `${lk.desc} · ${sc.name}`;
   $('#pv-card').classList.toggle('dawnish', c.look === 'dawn');
   const pace = c.quiet ? 'unhurried pacing' : (total / 1000 / Math.max(1, wc(L.x)) > .8 ? 'slow pacing' : 'steady pacing');
   $('#pv-why').textContent = (c.note && fresh !== 'nudge' ? c.note + ' ' : `Set for what you wrote: ${pace}, ${lk.desc.toLowerCase()}, a ${c.quiet ? 'hushed' : 'quiet'} score. `) + 'Your words are unchanged.';
   $('#pv-total').textContent = `The pacing · ${Math.round(total / 1000)} seconds, ${bs.length} beats`;
+  $('#pv-secs').textContent = `${Math.round(total / 1000)} s`;
+  $('#pv-ticks').innerHTML = bs.map(b => `<i style="flex:${b.dur} 1 0"></i>`).join('');
   const max = Math.max(...bs.map(b => b.dur));
   $('#pv-beats').innerHTML = bs.map((b, i) => `<li data-i="${i}"><button type="button"><span class="tx">${esc(b.text)}</span><span class="sec">${(b.dur / 1000).toFixed(1)} s</span><span class="kind">${KIND[b.st]}</span><span class="bar2"><i style="width:${Math.round(b.dur / max * 100)}%"></i></span></button></li>`).join('');
-  $$('#pv-beats li').forEach(li => li.querySelector('button').addEventListener('click', () => cardLoop(+li.dataset.i)));
-  cardLoop(0);
+  $$('#pv-beats li').forEach(li => li.querySelector('button').addEventListener('click', () => { closePacing(); cardLoop(+li.dataset.i, true); }));
+  cardLoop(0, fresh === 'nudge');
 }
 let CL = null;
 function stopCardLoop() { if (CL) clearTimeout(CL); CL = null; }
-function cardLoop(i) {
+function cardLoop(i, soft) {
   stopCardLoop(); const L = D.L, bs = effBeats(L), st = $('#pv-stage');
-  setStageLook(st, L.c); if (i === 0) st.innerHTML = '';
   const step = j => {
     if (current !== 'preview') return;
-    const b = bs[j % bs.length]; renderBeat(st, b, L, j % bs.length);
-    $$('#pv-beats li').forEach((li, k) => li.classList.toggle('on', k === j % bs.length));
+    const k = j % bs.length, b = bs[k];
+    // At the end of the loop, let the last line dissolve and hold the dark a moment before starting over.
+    if (k === 0 && j > 0 && !step.rested) { st.querySelectorAll('.beat').forEach(o => o.classList.add('out')); step.rested = true; CL = setTimeout(() => step(j), 1800); return; }
+    step.rested = false; if (k === 0) st.innerHTML = '';
+    renderBeat(st, b, L, k);
+    $$('#pv-beats li').forEach((li, n) => li.classList.toggle('on', n === k));
+    $$('#pv-ticks i').forEach((t, n) => { t.className = n < k ? 'done' : n === k ? 'on' : ''; if (n === k) { t.style.setProperty('--dur', b.dur + 'ms'); t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; } });
     CL = setTimeout(() => step(j + 1), b.dur);
   };
-  step(i);
+  // A nudge or a jump dims the card for a moment, then the new version plays in.
+  if (soft && st.children.length) {
+    st.classList.add('fading');
+    CL = setTimeout(() => { setStageLook(st, L.c); st.innerHTML = ''; st.classList.remove('fading'); step(i); }, 420);
+  } else { setStageLook(st, L.c); st.innerHTML = ''; step(i); }
 }
+
+/* the pacing sheet: slides up over the preview, drag or tap outside to put it away */
+const PS = $('#pace-sheet');
+function openPacing() {
+  if (!D.L || !$('#pv-beats').children.length) return;
+  PS.hidden = false; PS.style.setProperty('--drag', '0px'); void PS.offsetWidth; PS.classList.add('open');
+  const on = $('#pv-beats li.on'); if (on) on.scrollIntoView({ block: 'nearest' });
+}
+function closePacing() {
+  if (PS.hidden) return; PS.classList.remove('open', 'dragging'); PS.style.setProperty('--drag', '0px');
+  clearTimeout(PS._t); PS._t = setTimeout(() => { if (!PS.classList.contains('open')) PS.hidden = true; }, 560);
+}
+$('#b-pacing').addEventListener('click', openPacing);
+PS.querySelector('.scrim').addEventListener('click', closePacing);
+(() => {
+  let y0 = 0, dy = 0, t0 = 0, id = null;
+  const down = e => { id = e.pointerId; y0 = e.clientY; dy = 0; t0 = performance.now(); PS.classList.add('dragging'); try { e.currentTarget.setPointerCapture(id); } catch (_) {} };
+  const move = e => { if (e.pointerId !== id) return; dy = Math.max(0, e.clientY - y0); PS.style.setProperty('--drag', (dy < 0 ? dy / 4 : dy) + 'px'); };
+  const up = e => { if (e.pointerId !== id) return; id = null; PS.classList.remove('dragging'); const v = dy / Math.max(1, performance.now() - t0); if (dy > 110 || v > .6) { haptic('soft'); closePacing(); } else PS.style.setProperty('--drag', '0px'); };
+  PS.querySelectorAll('.grab,.phead').forEach(h => { h.addEventListener('pointerdown', down); h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up); });
+})();
 $('.nudges').addEventListener('click', e => {
   const b = e.target.closest('.nudge'); if (!b || !D.L) return; const c = D.L.c, k = b.dataset.nudge;
   if (k === 'another') { c.look = LOOKS[(LOOKS.indexOf(c.look) + 1) % LOOKS.length]; c.seed = (Math.random() * 1e9) | 0; }
   else { c[k] = !c[k]; b.setAttribute('aria-pressed', String(c[k])); }
+  haptic('light');
   renderPreview('nudge');
 });
 $('#b-pvplay').addEventListener('click', () => { audio(); stopCardLoop(); startPlayback(D.L, 'preview'); });
@@ -1086,22 +1313,35 @@ function setWhen(k) {
   else { const d = new Date(ts); const tm = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); const m = tm.match(/^(.*?)\s*([AaPp]\.?[Mm]\.?)$/); w.innerHTML = `${esc(d.toLocaleDateString(undefined, { weekday: 'long' }))}<br><i>${esc(m ? m[1] : tm)}</i>${m ? `<small>${esc(m[2])}</small>` : ''}`; }
   $('#seal-lbl').textContent = 'Hold to seal';
 }
-$$('.chip').forEach(c => c.addEventListener('click', () => setWhen(c.dataset.when)));
+$$('.chip').forEach(c => c.addEventListener('click', () => { if (D.when !== c.dataset.when) haptic('light'); setWhen(c.dataset.when); }));
 
+// Hold to act. The ring fills with a slow start and a firm finish; letting go early drains it back
+// smoothly from wherever it got to. The press deepens as you hold (--hp), and gives a little when it lands.
 function holdable(btn, ms, h) {
   const prog = btn.querySelector('.prog'), len = parseFloat(prog.getAttribute('stroke-dasharray'));
-  let t0 = 0, raf = 0, active = false, done = false;
-  const set = p => prog.setAttribute('stroke-dashoffset', String(len * (1 - p)));
-  const tick = () => { const p = Math.min(1, (performance.now() - t0) / ms); set(p); if (p >= 1) { active = false; done = true; btn.classList.remove('holding'); h.done && h.done(); return; } raf = requestAnimationFrame(tick); };
-  const start = () => { if (active || btn.disabled || (h.can && !h.can())) return; active = true; done = false; t0 = performance.now(); btn.classList.add('holding'); h.start && h.start(); raf = requestAnimationFrame(tick); };
-  const cancel = () => { audio(); if (!active) return; active = false; cancelAnimationFrame(raf); btn.classList.remove('holding'); prog.style.transition = 'stroke-dashoffset .35s'; set(0); setTimeout(() => prog.style.transition = '', 400); h.cancel && h.cancel(); };
+  let t0 = 0, raf = 0, active = false, done = false, p = 0, half = false;
+  const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+  const set = v => { p = v; prog.setAttribute('stroke-dashoffset', String(len * (1 - ease(v)))); btn.style.setProperty('--hp', ease(v).toFixed(3)); };
+  const tick = () => {
+    const v = Math.min(1, (performance.now() - t0) / ms); set(v);
+    if (!half && v >= .5) { half = true; haptic('soft'); }
+    if (v >= 1) { active = false; done = true; btn.classList.remove('holding'); btn.classList.add('landed'); haptic('heavy'); setTimeout(() => btn.classList.remove('landed'), 1500); h.done && h.done(); return; }
+    raf = requestAnimationFrame(tick);
+  };
+  const start = () => {
+    if (active || btn.disabled || (h.can && !h.can())) return;
+    cancelAnimationFrame(raf); active = true; done = false; half = p >= .5;
+    t0 = performance.now() - p * ms; btn.classList.add('holding'); btn.classList.remove('landed'); haptic('light'); h.start && h.start(); raf = requestAnimationFrame(tick);
+  };
+  const drain = () => { const from = p, t1 = performance.now(), dur = 260 + 340 * from; const step = () => { const k = Math.min(1, (performance.now() - t1) / dur); set(from * (1 - (1 - Math.pow(1 - k, 3)))); if (k < 1 && !active) raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); };
+  const cancel = () => { audio(); if (!active) return; active = false; cancelAnimationFrame(raf); btn.classList.remove('holding'); drain(); h.cancel && h.cancel(); };
   btn.addEventListener('pointerdown', e => { e.preventDefault(); audio(); try { btn.setPointerCapture(e.pointerId); } catch (_) {} start(); });
   btn.addEventListener('pointerup', cancel); btn.addEventListener('pointercancel', cancel); btn.addEventListener('lostpointercapture', cancel);
   btn.addEventListener('contextmenu', e => e.preventDefault());
   btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); audio(); start(); } });
   btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') cancel(); });
   btn.addEventListener('click', e => e.preventDefault());
-  return { reset: () => { active = false; done = false; set(0); } };
+  return { reset: () => { cancelAnimationFrame(raf); active = false; done = false; btn.classList.remove('holding', 'landed'); set(0); } };
 }
 const sealHold = holdable($('#b-seal'), 1500, {
   start: () => { $('#seal-lbl').textContent = 'Sealing…'; },
@@ -1138,7 +1378,7 @@ function openLetter(L, where, hash, preview, home) {
 $('#b-notif').addEventListener('click', () => { audio(); openCover(); });
 let coverTimer = 0;
 function openCover() {
-  const L = R.L; const cv = $('#cover'); cv.classList.remove('opening'); $('#s-cover').classList.toggle('is-home', !!R.home);
+  const L = R.L; const cv = $('#cover'); cv.classList.remove('opening'); $('#s-cover').classList.remove('opening'); $('#s-cover').classList.toggle('is-home', !!R.home);
   $('#cv-from').textContent = `A Kept message from ${L.f}`; $('#cv-for').textContent = `For ${L.t}`;
   $('#cv-meta').textContent = `${totalSec(L)} seconds · scored for this message`;
   $('#cv-hp').textContent = L.h ? 'Headphones help.' : '';
@@ -1163,7 +1403,7 @@ const openHold = holdable($('#b-open'), 1300, {
   start: () => { $('#cv-hint').textContent = 'Keep holding'; },
   cancel: () => { $('#cv-hint').textContent = 'Hold the light to open'; },
   done: () => {
-    clearInterval(coverTimer); $('#cover').classList.add('opening');
+    clearInterval(coverTimer); $('#cover').classList.add('opening'); $('#s-cover').classList.add('opening');
     const L = R.L;
     if (R.hash && !R.preview) { const got = store.get('got', []); if (!got.find(g => g.h === R.hash)) { got.push({ h: R.hash, f: L.f, t: L.t, s: totalSec(L) }); store.set('got', got.slice(-20)); } }
     setTimeout(() => startPlayback(L, 'receive'), 1500);
@@ -1220,11 +1460,11 @@ $('#s-play').addEventListener('click', e => {
   if (PB.i < 0 || PB.i >= PB.beats.length) return;
   const st = $('#pl-stage'), note = $('#pl-note');
   if (!PB.paused) {
-    PB.paused = true; clearTimeout(PB.timer); PB.remain -= performance.now() - PB.t0; st.classList.add('paused');
+    haptic('soft'); PB.paused = true; clearTimeout(PB.timer); PB.remain -= performance.now() - PB.t0; st.classList.add('paused');
     if (PB.sess) PB.sess.paused = true; if (AU.ctx) AU.ctx.suspend().catch(() => {});
     note.textContent = 'Paused · tap to go on'; note.style.opacity = '1'; $('#pl-ctl').classList.remove('dim'); clearTimeout(PB.noteT);
   } else {
-    PB.paused = false; st.classList.remove('paused'); PB.t0 = performance.now(); PB.timer = setTimeout(next, Math.max(50, PB.remain));
+    haptic('soft'); PB.paused = false; st.classList.remove('paused'); PB.t0 = performance.now(); PB.timer = setTimeout(next, Math.max(50, PB.remain));
     if (AU.ctx && !PB.muted) AU.ctx.resume().catch(() => {}); if (PB.sess) PB.sess.paused = false;
     note.style.opacity = '0'; PB.noteT = setTimeout(() => $('#pl-ctl').classList.add('dim'), 1500);
   }
@@ -1253,7 +1493,7 @@ function showEnd() {
     add(already ? 'On your shelf' : 'Keep it', b => {
       const sh = store.get('shelf', []);
       if (!sh.some(k => (k.id || k.h) === key)) { sh.push(L === DEMO ? { id: 'demo', f: L.f, k: Date.now(), p: L.x.slice(0, 48) } : { h: R.hash, f: L.f, k: Date.now(), p: L.x.slice(0, 48) }); store.set('shelf', sh.slice(-40)); }
-      b.textContent = 'On your shelf'; b.classList.add('done'); toast('Kept on your shelf');
+      if (!b.classList.contains('done')) haptic('medium'); b.textContent = 'On your shelf'; b.classList.add('done'); toast('Kept on your shelf');
     }, already ? 'done' : '');
     if (L.r) add('Answer in kind', () => openWrite({ to: L.f, from: L.t === 'you' ? '' : L.t, text: '' }));
     add('Print it', () => openPoster(L));
@@ -1295,7 +1535,7 @@ async function drawPoster(L) {
 async function openPoster(L) {
   const sh = document.createElement('div'); sh.className = 'sheet';
   sh.innerHTML = `<button class="closex" type="button" aria-label="Close" style="color:#EEE7DB"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><div class="in gut"><p class="eyebrow" style="color:#A69D90">Print-ready · 18 × 24 in</p><div class="cap">Setting the type…</div></div>`;
-  $('#app').appendChild(sh); sh.querySelector('.closex').addEventListener('click', () => sh.remove());
+  $('#app').appendChild(sh); sh.querySelector('.closex').addEventListener('click', () => dismiss(sh));
   const c = await drawPoster(L); const url = c.toDataURL('image/png');
   const blob = await new Promise(r => c.toBlob(r, 'image/png'));
   const inn = sh.querySelector('.in'); inn.innerHTML = `<p class="eyebrow" style="color:#A69D90">Print-ready · 18 × 24 in</p><img alt="Poster of ${esc(L.f)}'s letter to ${esc(L.t)}" src="${url}">`;
