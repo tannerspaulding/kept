@@ -18,7 +18,7 @@
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Inter:wght@400;500;600;800&display=swap">
 <style>
 /* Layout: one phone-width column of stacked full-screen screens. Paper for the sender, low light for the receiver. One committed look, not themed. */
 :root{
@@ -305,9 +305,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .stage::before{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 50% 42%,var(--glow),transparent 55%);animation:drift 14s ease-in-out infinite alternate;z-index:0}
 .stage::after{content:"";position:absolute;inset:0;background-image:var(--gr);background-size:220px;opacity:var(--gro);mix-blend-mode:var(--grb);pointer-events:none;z-index:4}
 @keyframes drift{from{transform:translate(-3%,-2%) scale(1)}to{transform:translate(3%,3%) scale(1.08)}}
-.look-vesper{--sbg:#100F0E;--sfg:#EEE7DB;--acc:#D9955F;--glow:rgba(206,139,88,.17);--soft:#A69D90;--gr:var(--grain-d);--gro:.55;--grb:screen;--mos:.13}
-.look-dawn{--sbg:#F2ECE2;--sfg:#1B1917;--acc:#A8622F;--glow:rgba(236,178,120,.33);--soft:#6A635A;--gr:var(--grain-l);--gro:.7;--grb:multiply;--mos:.16}
-.look-hearth{--sbg:#1D130F;--sfg:#F3E5D3;--acc:#EBA266;--glow:rgba(222,128,72,.24);--soft:#B9A38E;--gr:var(--grain-d);--gro:.5;--grb:screen;--mos:.14}
+.look-vesper{--sbg:#100F0E;--sfg:#EEE7DB;--acc:#D9955F;--glow:rgba(206,139,88,.17);--soft:#A69D90;--gr:var(--grain-d);--gro:.55;--grb:screen;--mos:.22}
+.look-dawn{--sbg:#F2ECE2;--sfg:#1B1917;--acc:#A8622F;--glow:rgba(236,178,120,.33);--soft:#6A635A;--gr:var(--grain-l);--gro:.7;--grb:multiply;--mos:.16;--lit:color-mix(in srgb,var(--acc) 80%,#000)}
+.look-hearth{--sbg:#1D130F;--sfg:#F3E5D3;--acc:#EBA266;--glow:rgba(222,128,72,.24);--soft:#B9A38E;--gr:var(--grain-d);--gro:.5;--grb:screen;--mos:.22}
 .stage.warm{--glow:rgba(232,140,70,.32)}
 .stage.quiet{--glow:rgba(206,139,88,.09)}
 .stage.quiet.look-dawn{--glow:rgba(236,178,120,.18)}
@@ -345,13 +345,18 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .em-glow{color:var(--acc);font-style:italic;text-shadow:0 0 .35em var(--glow)}
 .st-close .em-glow{animation:wIn 2s cubic-bezier(.25,.1,.25,1) both,glowp 4s ease-in-out 1s infinite;animation-delay:calc(var(--lead,0ms) + var(--d,0ms)),calc(var(--lead,0ms) + var(--d,0ms) + 2s)}
 @keyframes glowp{50%{text-shadow:0 0 .6em var(--acc)}}
-.mosaic{position:absolute;left:7cqw;right:7cqw;top:9cqh;bottom:24cqh;overflow:hidden;font:400 2.25cqw/1.62 var(--sans);text-align:justify;color:var(--sfg);animation:fadeIn 1.8s var(--ease) both;animation-delay:var(--lead,0ms);-webkit-mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 6%,#000 92%,transparent)}
-.mosaic span{opacity:var(--mos)}
-.mosaic span.lit{animation:lit 1.2s ease both;animation-delay:calc(var(--lead,0ms) + var(--ld,0ms))}
-@keyframes lit{from{opacity:var(--mos)}to{opacity:1;color:var(--acc)}}
+/* The echo beat, as in the deck: the whole letter set small and dense, nearly filling the frame, and the
+   repeated words lit inside it as huge stretched capitals (I / NOTI / CED). */
+.mosaic{position:absolute;left:7cqw;right:7cqw;top:9.5cqh;bottom:15cqh;overflow:hidden;font:400 1.52cqw/1.24 var(--sans);text-align:justify;color:var(--sfg);
+  animation:fadeIn 1.8s var(--ease) both;animation-delay:var(--lead,0ms);-webkit-mask-image:linear-gradient(180deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(180deg,transparent,#000 3%,#000 97%,transparent)}
+.mosaic .base{opacity:var(--mos)}
+/* The lit copy: the same text in warm bone, seen only through the shape of the words. */
+.mosaic .lit-layer{position:absolute;inset:0;color:var(--lit,color-mix(in srgb,var(--acc) 45%,var(--sfg)));-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  opacity:0;animation:litIn 2.6s cubic-bezier(.25,.1,.25,1) both;animation-delay:calc(var(--lead,0ms) + var(--ld,0ms))}
+@keyframes litIn{from{opacity:0;filter:blur(3px)}to{opacity:.92;filter:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.st-echo{justify-content:flex-end;padding-bottom:9cqh}
-.t-echo{font-style:italic;font-size:min(7.6cqw,4cqh);line-height:1.16;text-align:center;text-wrap:balance}
+.st-echo{justify-content:flex-end;padding-bottom:7.5cqh}
+.t-echo{font-style:italic;font-size:min(5.4cqw,2.9cqh);line-height:1.16;text-align:center;text-wrap:balance}
 .stage .mark{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:var(--acc)}
 
 /* play screen */
@@ -389,7 +394,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .toast.bye{animation:fadeAway .5s var(--ease) forwards}
 
 @media (prefers-reduced-motion:reduce){
-  .w,.w.land,.w.fall,.t-item,.mosaic span.lit{animation-duration:1.2s!important;transform:none!important;filter:none!important}
+  .w,.w.land,.w.fall,.t-item,.mosaic .lit-layer{animation-duration:1.2s!important;transform:none!important;filter:none!important}
   .beat,.beat.out{scale:none!important}
   @keyframes fall{from{opacity:0}to{opacity:1}}
   .rings .rg,.stage::before{animation:none}
@@ -649,6 +654,7 @@ function grain(dark) {
   return c.toDataURL('image/png');
 }
 const GRAIN_L = grain(false), GRAIN_D = grain(true);
+try { document.fonts.load("800 100px Inter"); } catch (e) {}
 document.documentElement.style.setProperty('--grain-l', `url(${GRAIN_L})`);
 document.documentElement.style.setProperty('--grain-d', `url(${GRAIN_D})`);
 
@@ -1022,30 +1028,57 @@ function renderBeat(stage, b, L, idx) {
       break;
     }
     case 'echo': {
-      const words = (L.x.match(/\S+/g) || []);
-      const sw = stage.clientWidth || 360, sh = stage.clientHeight || 640;
-      const need = Math.min(1400, Math.ceil((sw * sh) / Math.pow(sw * .0225, 2) / 5.2));
-      let html = ''; for (let k = 0; k < need; k++) html += '<span>' + esc(words[k % words.length]) + '</span> ';
-      el.innerHTML = `<div class="mosaic">${html}</div><p class="t-echo">${wordsHTML(b.text, 900, D * .3)}</p>`;
+      // Repeat the letter until it overfills the box: about 0.52em per character at 1.52cqw on 1.24 leading.
+      const sw = stage.clientWidth || 360, sh = stage.clientHeight || 640, fs = sw * .0152;
+      const chars = Math.ceil((sw * .86 / (fs * .5)) * (sh * .76 / (fs * 1.24)) * 1.15), one = L.x + ' ';
+      const txt = esc(one.repeat(Math.max(1, Math.ceil(chars / one.length))));
+      el.innerHTML = `<div class="mosaic"><div class="base">${txt}</div></div><p class="t-echo">${wordsHTML(b.text, 900, D * .3)}</p>`;
+      
       break;
     }
   }
   stage.querySelectorAll('.beat:not(.out)').forEach(o => { o.classList.add('out'); setTimeout(() => o.remove(), 1100); });
   stage.appendChild(el);
-  if (b.st === 'echo') requestAnimationFrame(() => lightMosaic(stage, el, D));
+  if (b.st === 'echo') requestAnimationFrame(() => litMosaic(el, echoWords(b.text), D));
 }
-function lightMosaic(stage, el, D) {
-  const mo = el.querySelector('.mosaic'); if (!mo) return;
-  const sr = stage.getBoundingClientRect(), W = sr.width, H = sr.height;
-  const cx = W / 2, cy = H * .44, R = W * .3, th = W * .095, dotR = W * .065, dy = cy - R * .2;
-  mo.querySelectorAll('span').forEach(s => {
-    const q = s.getBoundingClientRect(); const x = q.left - sr.left + q.width / 2, y = q.top - sr.top + q.height / 2;
-    const dx = x - cx, dyy = y - cy, dist = Math.hypot(dx, dyy);
-    let delay = -1;
-    if (Math.abs(dist - R) < th / 2 && y <= cy + th * .25) { const ang = Math.atan2(-dyy, dx); delay = (1 - Math.max(0, Math.min(Math.PI, ang)) / Math.PI) * D * .45 + 800; }
-    else if (Math.hypot(x - cx, y - dy) < dotR) delay = D * .5 + 900;
-    if (delay >= 0) { s.style.setProperty('--ld', Math.round(delay) + 'ms'); s.classList.add('lit'); }
+// The words the echo turns on: what the repeated lines share ("I noticed. I noticed all of it." -> "I NOTICED"),
+// otherwise the first line, kept to a couple of words so the letters can be huge.
+function echoWords(text) {
+  const parts = text.split(/(?<=[.!?])\s+/).map(p => (p.toLowerCase().match(/[a-z0-9']+/g) || []));
+  let w = parts[0] || [];
+  if (parts.length > 1) { const k = w.findIndex((x, i) => x !== parts[1][i]); if (k !== 0) w = k < 0 ? w : w.slice(0, k); }
+  w = w.slice(0, 2); while (w.length > 1 && w.join('').length > 12) w = w.slice(0, -1);
+  return w.join(' ').toUpperCase();
+}
+// Set the words as heavy capitals, a few letters to a row (NOTICED -> NOTI / CED), each row stretched
+// to the full width and all rows together filling the height, like the deck. A lone letter keeps its width.
+function litMosaic(el, phrase, D) {
+  const mo = el.querySelector('.mosaic'); if (!mo || !phrase) return;
+  const W = mo.clientWidth, H = mo.clientHeight; if (!W || !H) return;
+  const words = phrase.split(' '), longest = Math.max(...words.map(w => w.length));
+  let n = longest <= 5 ? 5 : 4, lines;
+  const wrap = n => { const out = []; words.forEach(w => { const k = Math.ceil(w.length / n), m = Math.ceil(w.length / k); const bits = w.match(new RegExp(`.{1,${m}}`, 'g')); bits.forEach(b => { const l = out[out.length - 1]; if (l != null && k === 1 && l.length + 1 + b.length <= n) out[out.length - 1] = l + ' ' + b; else out.push(b); }); }); return out; };
+  while ((lines = wrap(n)).length > 4) n++;
+  const dpr = Math.min(2, window.devicePixelRatio || 1), c = document.createElement('canvas');
+  c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); const x = c.getContext('2d'); x.scale(dpr, dpr);
+  const S = 100; x.font = `800 ${S}px Inter, 'Helvetica Neue', Arial, sans-serif`; x.textBaseline = 'alphabetic'; x.fillStyle = x.strokeStyle = '#fff';
+  const pad = H * .015, gapY = H * .035, rowH = (H - pad * 2 - gapY * (lines.length - 1)) / lines.length, cap = S * .727, sy = rowH / cap;
+  const gapX = W * .03, rows = lines.map(l => { const ch = [...l.replace(/ /g, '')]; const ws = ch.map(k => x.measureText(k).width); return { ch, ws, sum: ws.reduce((a, b) => a + b, 0) }; });
+  const fit = r => (W * .985 - gapX * (r.ch.length - 1)) / r.sum, multi = rows.filter(r => r.ch.length > 1);
+  const sxOne = multi.length ? Math.min(...multi.map(fit)) : Math.min(fit(rows[0]), sy * .9);
+  rows.forEach((r, i) => {
+    const sx = r.ch.length > 1 ? fit(r) : sxOne, total = r.sum * sx + gapX * (r.ch.length - 1);
+    let cx = (W - total) / 2; const base = pad + i * (rowH + gapY) + rowH;
+    r.ch.forEach((k, j) => {
+      x.save(); x.translate(cx, base); x.scale(sx, sy); x.lineWidth = S * .05; x.lineJoin = 'round';
+      x.fillText(k, 0, 0); x.strokeText(k, 0, 0); x.restore();
+      cx += r.ws[j] * sx + gapX;
+    });
   });
+  const lit = document.createElement('div'); lit.className = 'lit-layer'; lit.setAttribute('aria-hidden', 'true');
+  lit.textContent = mo.querySelector('.base').textContent; const url = `url(${c.toDataURL()})`;
+  lit.style.webkitMaskImage = url; lit.style.maskImage = url; lit.style.setProperty('--ld', Math.round(Math.max(900, D * .22)) + 'ms');
+  mo.appendChild(lit);
 }
 function setStageLook(stage, c) { stage.className = 'stage look-' + c.look + (c.warm ? ' warm' : '') + (c.quiet ? ' quiet' : ''); }
 
