@@ -28,14 +28,15 @@
   --serif:'Fraunces','Iowan Old Style',Georgia,serif;
   --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --ground:#F3EEE6; --grain-l:none; --grain-d:none;
+  --settle:cubic-bezier(.16,1,.3,1); --ease:cubic-bezier(.33,0,.2,1);
   color-scheme:light;
 }
-html{height:100%;box-sizing:border-box;background:var(--ground);transition:background-color .5s}
+html{height:100%;box-sizing:border-box;background:var(--ground);transition:background-color .9s var(--ease)}
 body{height:100%;margin:0;background:var(--ground);color:var(--char);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ember);outline-offset:3px;border-radius:6px}
-#app{position:relative;height:100%;width:100%;max-width:520px;margin:0 auto;overflow:hidden;background:var(--paper)}
+#app{position:relative;height:100%;width:100%;max-width:520px;margin:0 auto;overflow:hidden;background:var(--ground);transition:background-color .9s var(--ease)}
 .desk-note{display:none}
 @media (min-width:760px) and (min-height:720px){
   html,body{background:var(--surround)}
@@ -45,8 +46,23 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 }
 
 /* screens */
-.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;animation:scrIn .5s ease both}
-@keyframes scrIn{from{opacity:0}to{opacity:1}}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+/* Screen changes: the old screen lifts away and fades, the new one rises a few pixels and settles.
+   Paper to dark goes through a short dim instead of a crossfade, like a room light going down. */
+.scr.entering{z-index:3;animation:scrIn var(--td,.64s) var(--settle) var(--tdl,0s) backwards}
+.scr.entering[data-dir="back"]{animation-name:scrInBack}
+.scr.leaving{z-index:2;pointer-events:none;animation:scrOut var(--to,.42s) var(--ease) forwards}
+.scr.leaving[data-dir="back"]{animation-name:scrOutBack}
+@keyframes scrIn{from{opacity:0;transform:translate3d(0,16px,0) scale(.992)}}
+@keyframes scrInBack{from{opacity:0;transform:translate3d(0,-10px,0) scale(1.004)}}
+@keyframes scrOut{to{opacity:0;transform:translate3d(0,-10px,0) scale(.994)}}
+@keyframes scrOutBack{to{opacity:0;transform:translate3d(0,12px,0)}}
+.scr.entering .stagger>*:not(.own){animation:rise .9s var(--settle) backwards;animation-delay:calc(var(--tdl,0s) + 90ms + var(--si,0) * 65ms)}
+.stagger>:nth-child(2){--si:1}.stagger>:nth-child(3){--si:2}.stagger>:nth-child(4){--si:3}.stagger>:nth-child(5){--si:4}
+.stagger>:nth-child(6){--si:5}.stagger>:nth-child(7){--si:6}.stagger>:nth-child(8){--si:7}.stagger>:nth-child(n+9){--si:8}
+@keyframes rise{from{opacity:0;transform:translate3d(0,10px,0)}}
+@keyframes fadeUp{from{opacity:0;transform:translate3d(0,8px,0)}}
+@keyframes fadeAway{to{opacity:0;transform:translate3d(0,4px,0)}}
 .paper{background:var(--paper);color:var(--char)}
 .paper::after,.dark::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0}
 .paper::after{background-image:var(--grain-l);background-size:220px;mix-blend-mode:multiply;opacity:.55}
@@ -134,6 +150,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .composing{position:absolute;inset:5px;border-radius:20px;background:#13110F;color:var(--bone);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:6;text-align:center;padding:24px}
 .composing .arc{width:54px;height:33px;animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{50%{opacity:.35;transform:scale(.94)}}
+.composing{transition:opacity .9s var(--ease),visibility 0s .9s}
+.composing.gone{opacity:0;visibility:hidden}
+.composing .line{transition:opacity .45s var(--ease)}
+.composing .line.swap{opacity:0}
 .composing .line{font-family:var(--serif);font-style:italic;font-weight:300;font-size:21px;min-height:1.4em}
 .nudges{display:flex;flex-wrap:wrap;gap:8px}
 .nudge{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line-l);font-size:14.5px;color:var(--char);background:rgba(255,255,255,.25)}
@@ -236,7 +256,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .cover .hint{margin-top:auto;font-size:15px;color:#cfc6b9}
 .cover .hp{font-size:12.5px;color:var(--mute-d);margin-top:8px}
 .cover.opening .rings{transform:scale(1.9);opacity:0;filter:blur(6px)}
-.cover.opening .for,.cover.opening .meta,.cover.opening .hint,.cover.opening .eyebrow,.cover.opening .hp{opacity:0;transition:opacity .8s}
+.cover.opening .for,.cover.opening .meta,.cover.opening .hint,.cover.opening .eyebrow,.cover.opening .hp,.cover.opening .writebtn,#s-cover.opening .homebar,#s-cover.opening .closex{opacity:0;transition:opacity .8s var(--ease)}
 
 /* playback stage, shared by the full screen and the preview card */
 .stage{position:relative;overflow:hidden;container-type:size;background:var(--sbg);color:var(--sfg);isolation:isolate}
@@ -307,16 +327,22 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 .end .back{margin-top:26px;font-size:14px;color:var(--mute-d);padding:10px}
 
 /* poster sheet */
-.sheet{position:absolute;inset:0;z-index:40;background:rgba(10,9,8,.78);backdrop-filter:blur(10px);display:flex;flex-direction:column;animation:scrIn .4s both}
+.sheet{position:absolute;inset:0;z-index:40;background:rgba(10,9,8,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;flex-direction:column;animation:fadeIn .6s var(--ease) both}
+.sheet .in>*{animation:rise .9s var(--settle) .15s backwards}
+.sheet.bye{animation:fadeAway .45s var(--ease) forwards;pointer-events:none}
 .sheet .in{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:18px;padding-block:58px 30px;color:var(--bone)}
 .sheet img{width:min(100%,330px);border-radius:3px;box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);-webkit-touch-callout:default}
 .sheet .cap{font-size:13.5px;color:var(--mute-d);text-align:center;line-height:1.5;max-width:300px}
 .sheet .btn-ink{background:var(--bone);color:var(--char);max-width:300px}
-.toast{position:absolute;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--char);color:var(--bone);border-radius:999px;padding:11px 18px;font-size:14px;white-space:nowrap;animation:scrIn .3s both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast{position:absolute;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:60;background:var(--char);color:var(--bone);border-radius:999px;padding:11px 18px;font-size:14px;white-space:nowrap;animation:fadeUp .5s var(--settle) both;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.bye{animation:fadeAway .5s var(--ease) forwards}
 
 @media (prefers-reduced-motion:reduce){
   .w,.w.land,.t-item,.mosaic span.lit{animation-duration:1.2s!important;transform:none!important;filter:none!important}
   .rings .rg,.stage::before{animation:none}
+  .scr.entering,.scr.leaving{animation-duration:.25s!important;animation-delay:0s!important}
+  .scr.entering .stagger>*{animation:none!important}
+  @keyframes scrIn{from{opacity:0}} @keyframes scrInBack{from{opacity:0}} @keyframes scrOut{to{opacity:0}} @keyframes scrOutBack{to{opacity:0}}
   @keyframes wIn{from{opacity:0}to{opacity:1}}
   @keyframes land{from{opacity:0}to{opacity:1}}
 }
@@ -339,7 +365,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
   <!-- WRITE -->
   <section class="scr paper" id="s-write" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="home">Cancel</button><span class="t">New Kept</span><button class="r" type="button" id="b-compose" disabled>Compose</button></nav>
-    <div class="write-body gut scroll">
+    <div class="write-body gut scroll stagger">
       <label class="field"><span>To</span><input id="in-to" type="text" autocomplete="off" maxlength="40" placeholder="Their name"></label>
       <label class="field small"><span>From</span><input id="in-from" type="text" autocomplete="off" maxlength="40" placeholder="Your name"></label>
       <textarea id="in-text" maxlength="1400" placeholder="Say the thing you'd want them to keep."></textarea>
@@ -356,7 +382,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
   <section class="scr paper" id="s-preview" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="write">Back</button><span class="t">Preview</span><button class="r" type="button" id="b-next">Next</button></nav>
     <div class="scroll gut">
-      <div class="pv">
+      <div class="pv stagger">
         <h2 class="ital">Composed for you.</h2>
         <div class="card" id="pv-card">
           <div class="stage look-vesper" id="pv-stage"></div>
@@ -387,7 +413,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
   <section class="scr paper" id="s-deliver" hidden>
     <nav class="bar gut"><button class="l" type="button" data-go="preview">Back</button><span class="t">Deliver</span><span></span></nav>
     <div class="scroll gut">
-      <div class="dv">
+      <div class="dv stagger">
         <h2 class="ital" id="dv-q">When should they open it?</h2>
         <div class="chips" role="group" aria-label="When it opens">
           <button class="chip" type="button" data-when="now" aria-pressed="true">Now</button>
@@ -412,8 +438,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 
   <!-- SEALED -->
   <section class="scr paper" id="s-sealed" hidden>
-    <div class="sealed gut scroll">
-      <span class="mark" data-arc></span>
+    <div class="sealed gut scroll stagger">
+      <span class="mark own" data-arc></span>
       <h2>Sealed for <i id="sd-to">Jonah</i>.</h2>
       <p class="muted" id="sd-sub">Send them this link. It carries the whole letter, and it opens in Kept on their phone.</p>
       <div class="linkbox">
@@ -473,7 +499,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus
 
   <!-- END -->
   <section class="scr dark" id="s-end" hidden>
-    <div class="end gut">
+    <div class="end gut stagger">
       <span class="arc" data-arc></span>
       <div class="who" id="en-who"></div>
       <div class="acts" id="en-acts"></div>
@@ -936,16 +962,41 @@ function ringsSVG(svg, phrases, bright) {
 /* ---------- screens ---------- */
 const GROUND = { shelf: '#F3EEE6', write: '#F3EEE6', preview: '#F3EEE6', deliver: '#F3EEE6', sealed: '#F3EEE6', arrive: '#1B2233', cover: '#13110F', play: '#100F0E', end: '#13110F' };
 let current = '';
-function show(id) {
+// Rough order of the flow, so going back drifts the other way.
+const ORDER = { cover: 0, shelf: 1, write: 2, preview: 3, deliver: 4, sealed: 5, arrive: 6, play: 7, end: 8 };
+const DARK = new Set(['arrive', 'cover', 'play', 'end']);
+const leaveT = {};
+function show(id, opt = {}) {
   if (current === 'preview' && id !== 'preview') stopCardLoop();
-  $$('#app > .scr').forEach(s => { s.hidden = s.id !== 's-' + id; });
+  const nx = $('#s-' + id), pv = current && current !== id ? $('#s-' + current) : null, was = current;
   current = id;
+  if (pv) {
+    const back = opt.back != null ? opt.back : ORDER[id] < ORDER[was];
+    const tone = DARK.has(id) !== DARK.has(was), into = id === 'play';
+    // A change of light is slower and sequential; a page turn on paper is a quick crossfade.
+    const to = into ? .7 : tone ? .5 : .38, tdl = into ? .55 : tone ? .26 : .06, td = into ? 1.3 : tone ? .9 : .62;
+    pv.dataset.dir = nx.dataset.dir = back ? 'back' : 'fwd';
+    pv.style.setProperty('--to', to + 's'); nx.style.setProperty('--tdl', tdl + 's'); nx.style.setProperty('--td', td + 's');
+    pv.classList.remove('entering'); pv.classList.add('leaving');
+    clearTimeout(leaveT[pv.id]); leaveT[pv.id] = setTimeout(() => { pv.hidden = true; pv.classList.remove('leaving'); }, to * 1000 + 40);
+    nx.classList.remove('leaving', 'entering'); clearTimeout(leaveT[nx.id]); nx.hidden = false; void nx.offsetWidth; nx.classList.add('entering');
+    clearTimeout(leaveT[nx.id + 'e']); leaveT[nx.id + 'e'] = setTimeout(() => nx.classList.remove('entering'), (tdl + td) * 1000 + 900);
+    $$('#app > .scr').forEach(s => { if (s !== nx && s !== pv) { s.hidden = true; s.classList.remove('entering', 'leaving'); } });
+  } else if (!was) {
+    $$('#app > .scr').forEach(s => { s.hidden = s !== nx; });
+    nx.style.setProperty('--tdl', '.1s'); nx.style.setProperty('--td', '1.4s'); nx.classList.add('entering');
+  }
   document.documentElement.style.setProperty('--ground', id === 'play' && PB.L ? getComputedStyle($('#pl-stage')).getPropertyValue('--sbg') || GROUND.play : GROUND[id]);
   if (id === 'shelf') renderHome();
   const s = $('#s-' + id); const sc = s && s.querySelector('.scroll'); if (sc && id !== 'write') sc.scrollTop = 0;
 }
 document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (!g) return; if (g.dataset.go === 'home') { stopPlayback(true); clearInterval(coverTimer); goHome(); } else show(g.dataset.go); });
-function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; $('#app').appendChild(t); setTimeout(() => t.remove(), 2400); }
+function toast(msg) {
+  $$('.toast').forEach(o => o.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; $('#app').appendChild(t);
+  setTimeout(() => dismiss(t, 520), 2300);
+}
+const dismiss = (el, ms = 460) => { el.classList.add('bye'); setTimeout(() => el.remove(), ms); };
 const fmtWhen = ts => { const d = new Date(ts); return d.toLocaleDateString(undefined, { weekday: 'long' }) + ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
 const fmtDay = ts => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
@@ -1024,17 +1075,18 @@ $('#b-compose').addEventListener('click', async () => {
   store.set('me', from);
   D.L = { f: from, t: to, x: text, at: Date.now(), o: 0, h: true, r: true, c: composeRules(text, to) };
   show('preview'); $('#pv-to').textContent = to;
-  const cmp = $('#pv-composing'); cmp.hidden = false; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = '';
+  const cmp = $('#pv-composing'); cmp.hidden = false; cmp.classList.remove('gone'); $('#pv-stage').innerHTML = ''; $('#pv-beats').innerHTML = ''; $('#pv-why').textContent = '';
   $$('.nudge[aria-pressed]').forEach(b => b.setAttribute('aria-pressed', 'false'));
   let k = 0; $('#pv-cline').textContent = CLINES[0];
-  const iv = setInterval(() => { k = (k + 1) % CLINES.length; $('#pv-cline').textContent = CLINES[k]; }, 1500);
+  const cl = $('#pv-cline'); cl.classList.remove('swap');
+  const iv = setInterval(() => { k = (k + 1) % CLINES.length; cl.classList.add('swap'); setTimeout(() => { cl.textContent = CLINES[k]; cl.classList.remove('swap'); }, 460); }, 1700);
   const started = Date.now();
   const ai = await composeAI(text, to, from);
   const wait = Math.max(0, 2600 - (Date.now() - started)); await new Promise(r => setTimeout(r, wait));
   clearInterval(iv);
   if (current !== 'preview') return;
   if (ai) D.L.c = ai;
-  cmp.hidden = true; renderPreview(true);
+  cmp.classList.add('gone'); renderPreview(true);
 });
 function renderPreview(fresh) {
   const L = D.L, c = L.c, bs = effBeats(L), total = bs.reduce((a, b) => a + b.dur, 0);
@@ -1139,7 +1191,7 @@ function openLetter(L, where, hash, preview, home) {
 $('#b-notif').addEventListener('click', () => { audio(); openCover(); });
 let coverTimer = 0;
 function openCover() {
-  const L = R.L; const cv = $('#cover'); cv.classList.remove('opening'); $('#s-cover').classList.toggle('is-home', !!R.home);
+  const L = R.L; const cv = $('#cover'); cv.classList.remove('opening'); $('#s-cover').classList.remove('opening'); $('#s-cover').classList.toggle('is-home', !!R.home);
   $('#cv-from').textContent = `A Kept message from ${L.f}`; $('#cv-for').textContent = `For ${L.t}`;
   $('#cv-meta').textContent = `${totalSec(L)} seconds · scored for this message`;
   $('#cv-hp').textContent = L.h ? 'Headphones help.' : '';
@@ -1164,7 +1216,7 @@ const openHold = holdable($('#b-open'), 1300, {
   start: () => { $('#cv-hint').textContent = 'Keep holding'; },
   cancel: () => { $('#cv-hint').textContent = 'Hold the light to open'; },
   done: () => {
-    clearInterval(coverTimer); $('#cover').classList.add('opening');
+    clearInterval(coverTimer); $('#cover').classList.add('opening'); $('#s-cover').classList.add('opening');
     const L = R.L;
     if (R.hash && !R.preview) { const got = store.get('got', []); if (!got.find(g => g.h === R.hash)) { got.push({ h: R.hash, f: L.f, t: L.t, s: totalSec(L) }); store.set('got', got.slice(-20)); } }
     setTimeout(() => startPlayback(L, 'receive'), 1500);
@@ -1296,7 +1348,7 @@ async function drawPoster(L) {
 async function openPoster(L) {
   const sh = document.createElement('div'); sh.className = 'sheet';
   sh.innerHTML = `<button class="closex" type="button" aria-label="Close" style="color:#EEE7DB"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><div class="in gut"><p class="eyebrow" style="color:#A69D90">Print-ready · 18 × 24 in</p><div class="cap">Setting the type…</div></div>`;
-  $('#app').appendChild(sh); sh.querySelector('.closex').addEventListener('click', () => sh.remove());
+  $('#app').appendChild(sh); sh.querySelector('.closex').addEventListener('click', () => dismiss(sh));
   const c = await drawPoster(L); const url = c.toDataURL('image/png');
   const blob = await new Promise(r => c.toBlob(r, 'image/png'));
   const inn = sh.querySelector('.in'); inn.innerHTML = `<p class="eyebrow" style="color:#A69D90">Print-ready · 18 × 24 in</p><img alt="Poster of ${esc(L.f)}'s letter to ${esc(L.t)}" src="${url}">`;
